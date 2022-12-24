@@ -1,32 +1,47 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { User } from '@prisma/client';
-import { GetUserInput } from './dtos/get-user.dto';
-import { CreateUserInput } from './dtos/create-user.dto';
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { GetUserInput, GetUserOutput } from "./dtos/get-user.dto";
+import { CreateUserInput, CreateUserOutput } from "./dtos/create-user.dto";
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) {
+  }
 
-  async getUser({ id }: GetUserInput): Promise<User | null> {
+  async getUser({ id }: GetUserInput): Promise<GetUserOutput> {
     try {
-      return this.prisma.user.findUnique({
+      const user = await this.prisma.user.findUnique({
         where: {
-          id,
-        },
+          id
+        }
       });
+      console.log(user);
+      return {
+        ok: true,
+        user
+      };
+
     } catch (error) {
-      console.log(error);
+      return {
+        ok: false,
+        error: "User not found"
+      };
     }
   }
 
-  async createUser(data: CreateUserInput): Promise<User> {
+  async createUser(data: CreateUserInput): Promise<CreateUserOutput> {
     try {
-      return await this.prisma.user.create({
-        data,
+      await this.prisma.user.create({
+        data
       });
+      return {
+        ok: true
+      };
     } catch (error) {
-      console.log(error);
+      return {
+        ok: false,
+        error: "Could not create account"
+      };
     }
   }
 }

@@ -1,6 +1,4 @@
-import { CommonModule } from './common/common.module';
 import { Module } from '@nestjs/common';
-import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
@@ -21,8 +19,7 @@ import { UsersModule } from './users/users.module';
       },
     }),
     UsersModule,
-    CommonModule,
   ],
-  providers: [AppService],
+  providers: [],
 })
 export class AppModule {}
