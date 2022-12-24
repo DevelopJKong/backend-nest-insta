@@ -9,3 +9,34 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id           Int      @id @default(autoincrement()) @db.Integer
+  email        String   @unique @default("") @db.VarChar(255)
+  name         String   @default("") @db.VarChar(255)
+  password     String   @default("") @db.VarChar(255)
+  avatar       String   @default("avatar") @db.VarChar(255)
+  socialOnly   Boolean  @default(false) @db.Boolean
+  phonNum      String   @default("") @db.VarChar(255)
+  region       String   @default("한국") @db.VarChar(255)
+  verified     Boolean  @default(false) @db.Boolean
+  refreshToken String   @default("") @db.VarChar(255)
+  createdAt    DateTime @default(now()) @db.Timestamp(6)
+  updatedAt    DateTime @default(now()) @db.Timestamp(6)
+  boards       Board[]
+}
+
+model Board {
+  id           Int      @id @default(autoincrement()) @db.Integer
+  title        String   @default("") @db.VarChar(255)
+  content      String   @default("") @db.VarChar(255)
+  boardImgName String   @default("") @db.VarChar(255)
+  boardImgSize Int      @default(0) @db.Integer
+  boardImgPath String   @default("") @db.VarChar(255)
+  views        Int      @default(0) @db.Integer
+  rating       Int      @default(0) @db.Integer
+  createdAt    DateTime @default(now()) @db.Timestamp(6)
+  updatedAt    DateTime @default(now()) @db.Timestamp(6)
+  userId       Int      @db.Integer
+  owner        User     @relation(fields: [userId], references: [id])
+}

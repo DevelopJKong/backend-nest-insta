@@ -1,0 +1,40 @@
+-- CreateTable
+CREATE TABLE "User" (
+    "id" SERIAL NOT NULL,
+    "email" VARCHAR(255) NOT NULL DEFAULT '',
+    "name" VARCHAR(255) NOT NULL DEFAULT '',
+    "password" VARCHAR(255) NOT NULL DEFAULT '',
+    "avatar" VARCHAR(255) NOT NULL DEFAULT 'avatar',
+    "socialOnly" BOOLEAN NOT NULL DEFAULT false,
+    "phonNum" VARCHAR(255) NOT NULL DEFAULT '',
+    "region" VARCHAR(255) NOT NULL DEFAULT '한국',
+    "verified" BOOLEAN NOT NULL DEFAULT false,
+    "refreshToken" VARCHAR(255) NOT NULL DEFAULT '',
+    "createdAt" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Board" (
+    "id" SERIAL NOT NULL,
+    "title" VARCHAR(255) NOT NULL DEFAULT '',
+    "content" VARCHAR(255) NOT NULL DEFAULT '',
+    "boardImgName" VARCHAR(255) NOT NULL DEFAULT '',
+    "boardImgSize" INTEGER NOT NULL DEFAULT 0,
+    "boardImgPath" VARCHAR(255) NOT NULL DEFAULT '',
+    "views" INTEGER NOT NULL DEFAULT 0,
+    "rating" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "userId" INTEGER NOT NULL,
+
+    CONSTRAINT "Board_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- AddForeignKey
+ALTER TABLE "Board" ADD CONSTRAINT "Board_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
