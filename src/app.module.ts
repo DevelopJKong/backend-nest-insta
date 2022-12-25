@@ -6,6 +6,7 @@ import { UsersModule } from "./users/users.module";
 import { LoggerModule } from "./libs/logger/logger.module";
 import { ConfigModule } from "@nestjs/config";
 import * as Joi from "joi";
+import { JwtModule } from "./libs/jwt/jwt.module";
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import * as Joi from "joi";
       envFilePath: process.env.NODE_ENV === "dev" ? ".env.dev" : ".env.test",
       ignoreEnvFile: process.env.NODE_ENV === "prod",
       validationSchema: Joi.object({
-        NODE_ENV: Joi.string().valid("dev", "prod").required()
+        NODE_ENV: Joi.string().valid("dev", "prod").required(),
+        PRIVATE_KEY: Joi.string().required()
       })
     }),
     // ! GraphQL 설정 모듈
@@ -35,6 +37,9 @@ import * as Joi from "joi";
     // ! Logger 설정 모듈
     LoggerModule.forRoot({
       nodeEnv: process.env.NODE_ENV
+    }),
+    JwtModule.forRoot({
+      privateKey: process.env.PRIVATE_KEY
     }),
     UsersModule, // ! 유저 모듈
   ],

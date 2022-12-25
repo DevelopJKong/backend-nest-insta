@@ -4,10 +4,15 @@ import { GetUserInput, GetUserOutput } from "./dtos/get-user.dto";
 import { CreateUserInput, CreateUserOutput } from "./dtos/create-user.dto";
 import * as bcrypt from "bcrypt";
 import { LoggerService } from "../libs/logger/logger.service";
+import { LoginInput, LoginOutput } from "./dtos/login.dto";
+import { JwtService } from "../libs/jwt/jwt.service";
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService, private readonly log: LoggerService) {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly log: LoggerService,
+    private readonly jwtService: JwtService) {
   }
 
   async getUser({ id }: GetUserInput): Promise<GetUserOutput> {
@@ -19,7 +24,7 @@ export class UsersService {
         }
       });
 
-      // * 유저가 있을 경우
+      // ! 유저가 있을 경우
       this.log.logger().info(`${this.log.loggerInfo("유저 찾기")}`);
       return {
         ok: true,
@@ -84,4 +89,51 @@ export class UsersService {
       };
     }
   }
+
+  async login({ email, password }: LoginInput): Promise<LoginOutput> {
+    try {
+      // ! 데이터베이스에서 유저 찾기
+      const user = await this.prisma.user.findUnique({
+        where: {
+          email
+        }
+      });
+
+      // ! 유저가 없을 경우
+      if (!user) {
+        this.log.logger().error(`${this.log.loggerInfo("유저가 없을 경우")}`);
+        return {
+          ok: false,
+          error: "User not found"
+        };
+      }
+
+      // ! 비밀번호 확인
+      const passwordOk = await bcrypt.compare(password, user.password);
+
+      // ! 비밀번호가 틀릴 경우
+      if (!passwordOk) {
+        this.log.logger().error(`${this.log.loggerInfo("비밀번호가 틀릴 경우")}`);
+        return {
+          ok: false,
+          error: "Wrong password"
+        };
+      }
+
+      const token = this.jwtService.sign({ id: user.id });
+      // ! 로그인 성공
+      this.log.logger().info(`${this.log.loggerInfo("로그인 성공")}`);
+      return {
+        ok: true,
+        token
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: "existError"
+      };
+    }
+  }
+
+
 }

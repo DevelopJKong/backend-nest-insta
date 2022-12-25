@@ -1,14 +1,14 @@
 import { Field, InputType, ObjectType, PickType } from "@nestjs/graphql";
-import { User as EntityUser } from "../entities/user.entity";
+import { User } from "../entities/user.entity";
 import { CoreOutput } from "../../common/dtos/output.dto";
 
 
 @InputType()
-export class GetUserInput extends PickType(EntityUser, ["id"]) {
+export class GetUserInput extends PickType(User, ["id"]) {
 }
 
 @ObjectType()
 export class GetUserOutput extends CoreOutput {
-  @Field(() => EntityUser)
-  user?: EntityUser;
+  @Field((_returns) => User)
+  user?: User;
 }
