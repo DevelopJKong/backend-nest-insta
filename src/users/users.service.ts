@@ -6,6 +6,7 @@ import * as bcrypt from "bcrypt";
 import { LoggerService } from "../libs/logger/logger.service";
 import { LoginInput, LoginOutput } from "./dtos/login.dto";
 import { JwtService } from "../libs/jwt/jwt.service";
+import { EditProfileOutput } from "./dtos/edit-profile.dto";
 
 @Injectable()
 export class UsersService {
@@ -135,5 +136,18 @@ export class UsersService {
     }
   }
 
+  async editProfile({ email, password, firstName, lastName }): Promise<EditProfileOutput> {
+    try {
+
+      return {
+        ok: true
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: "existError"
+      }
+    }
+  }
 
 }
