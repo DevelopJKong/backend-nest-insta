@@ -4,17 +4,17 @@ import { UsersService } from "./users.service";
 import { User } from "./entities/user.entity";
 import { CreateUserInput, CreateUserOutput } from "./dtos/create-user.dto";
 
-@Resolver(() => User)
+@Resolver((_of) => User)
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {
   }
 
-  @Query(() => GetUserOutput)
+  @Query((_returns) => GetUserOutput)
   async getUser(@Args("input") id: GetUserInput): Promise<GetUserOutput> {
     return this.usersService.getUser(id);
   }
 
-  @Mutation(() => CreateUserOutput)
+  @Mutation((_returns) => CreateUserOutput)
   async createUser(@Args("input") createAccountInput: CreateUserInput): Promise<CreateUserOutput> {
     return this.usersService.createUser(createAccountInput);
   }
