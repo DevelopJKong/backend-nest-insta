@@ -24,7 +24,6 @@ export class UsersService {
           id,
         },
       });
-
       // ! 유저가 있을 경우
       this.log.logger().info(`${this.log.loggerInfo('유저 찾기')}`);
       return {
