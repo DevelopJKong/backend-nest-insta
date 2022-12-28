@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 import { Role } from '@prisma/client';
+=======
+>>>>>>> bba244e4316370d6ff519e72f0e31ce1a9583272
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { AllowedRoles } from './role.decorator';
 import { ExecutionContext } from '@nestjs/common';
@@ -6,6 +9,11 @@ import { UsersService } from './../../users/users.service';
 import { Injectable, CanActivate } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '../jwt/jwt.service';
+<<<<<<< HEAD
+=======
+import { ROLE_KEY } from 'src/common/common.constants';
+import { Role } from '@prisma/client';
+>>>>>>> bba244e4316370d6ff519e72f0e31ce1a9583272
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -15,7 +23,11 @@ export class AuthGuard implements CanActivate {
     private readonly usersService: UsersService,
   ) {}
   async canActivate(context: ExecutionContext) {
+<<<<<<< HEAD
     const roles = this.reflector.get<AllowedRoles>('roles', context.getHandler());
+=======
+    const roles = this.reflector.get<AllowedRoles>(ROLE_KEY, context.getHandler());
+>>>>>>> bba244e4316370d6ff519e72f0e31ce1a9583272
 
     // ! @RoleData()가 없는 경우
     if (!roles) return true;
@@ -33,7 +45,11 @@ export class AuthGuard implements CanActivate {
     // ! 토큰이 유효하지 않은 경우
     if (isDecodedCheck) return false;
 
+<<<<<<< HEAD
     const { user } = await this.usersService.findById(decoded['id']);
+=======
+    const { user } = await this.usersService.findById({ id: decoded['id'] });
+>>>>>>> bba244e4316370d6ff519e72f0e31ce1a9583272
 
     // ! 유저가 없는 경우
     if (!user) return false;
