@@ -32,7 +32,7 @@ export class UsersService {
           error: '존재하는 유저가 없습니다',
         };
       }
-      // ! 유저가 있을 경우
+      // * 유저가 있을 경우
       this.log.logger().info(`${this.log.loggerInfo('유저 찾기')}`);
       return {
         ok: true,
@@ -82,6 +82,8 @@ export class UsersService {
         },
       });
 
+      // * 유저 생성 완료
+      this.log.logger().info(`${this.log.loggerInfo('유저 생성 완료')}`);
       return {
         ok: true,
       };
@@ -127,13 +129,16 @@ export class UsersService {
       }
 
       const token = this.jwtService.sign({ id: user.id });
-      // ! 로그인 성공
+      // * 로그인 성공
       this.log.logger().info(`${this.log.loggerInfo('로그인 성공')}`);
       return {
         ok: true,
         token,
       };
     } catch (error) {
+      // ! extraError
+      const { message, name, stack } = error;
+      this.log.logger().error(`${this.log.loggerInfo('extraError', message, name, stack)}`);
       return {
         ok: false,
         error: 'existError',
@@ -143,7 +148,7 @@ export class UsersService {
 
   async editProfile(
     userId: number,
-    { email, password: newPassword, firstName, username, lastName }: EditProfileInput,
+    { email, password: newPassword, firstName, username, lastName, bio }: EditProfileInput,
   ): Promise<EditProfileOutput> {
     try {
       let hashedPassword: string;
@@ -164,16 +169,23 @@ export class UsersService {
         },
       });
       if (!updatedUser.id) {
+        // ! 유저가 없을 경우
+        this.log.logger().error(`${this.log.loggerInfo('유저가 없을 경우')}`);
         return {
           ok: false,
           error: 'updateError',
         };
       }
 
+      // * 회원 수정 완료
+      this.log.logger().info(`${this.log.loggerInfo('회원 수정 완료')}`);
       return {
         ok: true,
       };
     } catch (error) {
+      // ! extraError
+      const { message, name, stack } = error;
+      this.log.logger().error(`${this.log.loggerInfo('extraError', message, name, stack)}`);
       return {
         ok: false,
         error: 'existError',

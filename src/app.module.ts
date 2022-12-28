@@ -8,7 +8,6 @@ import { LoggerModule } from './libs/logger/logger.module';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { JwtModule } from './libs/jwt/jwt.module';
-
 @Module({
   imports: [
     // ! 피리즈마 설정 모듈
@@ -23,6 +22,7 @@ import { JwtModule } from './libs/jwt/jwt.module';
         PRIVATE_KEY: Joi.string().required(),
       }),
     }),
+
     // ! GraphQL 설정 모듈
     GraphQLModule.forRoot<ApolloDriverConfig>({
       installSubscriptionHandlers: true,

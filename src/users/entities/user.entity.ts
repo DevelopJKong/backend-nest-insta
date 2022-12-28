@@ -30,4 +30,11 @@ export class User extends CoreEntity {
   @Field(_type => Role)
   @IsEnum(Role)
   role: Role;
+
+  @Field(_type => String, { nullable: true })
+  @IsString()
+  bio?: string;
+
+  @Field(_type => String, { nullable: true })
+  avatar?: string;
 }
