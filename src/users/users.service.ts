@@ -39,7 +39,7 @@ export class UsersService {
         user,
       };
     } catch (error) {
-      //! extraError
+      // ! extraError
       const { message, name, stack } = error;
       this.log.logger().error(`${this.log.loggerInfo('extraError', message, name, stack)}`);
       return {
@@ -92,7 +92,7 @@ export class UsersService {
         ok: true,
       };
     } catch (error) {
-      //! extraError
+      // ! extraError
       const { message, name, stack } = error;
       this.log.logger().error(`${this.log.loggerInfo('extraError', message, name, stack)}`);
       return {
@@ -147,13 +147,10 @@ export class UsersService {
     }
   }
 
-  async editProfile({
-    email,
-    password: newPassword,
-    firstName,
-    username,
-    lastName,
-  }: EditProfileInput): Promise<EditProfileOutput> {
+  async editProfile(
+    userId: number,
+    { email, password: newPassword, firstName, username, lastName }: EditProfileInput,
+  ): Promise<EditProfileOutput> {
     try {
       let hashedPassword: string;
       if (newPassword) {
@@ -162,7 +159,7 @@ export class UsersService {
 
       const updatedUser = await this.prisma.user.update({
         where: {
-          id: 1,
+          id: userId,
         },
         data: {
           email,

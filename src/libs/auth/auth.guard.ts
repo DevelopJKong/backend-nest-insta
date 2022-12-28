@@ -1,9 +1,8 @@
 import { Role } from '@prisma/client';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { AllowedRoles } from './role.decorator';
-import { ExecutionContext } from '@nestjs/common';
+import { ExecutionContext, Injectable, CanActivate } from '@nestjs/common';
 import { UsersService } from './../../users/users.service';
-import { Injectable, CanActivate } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '../jwt/jwt.service';
 

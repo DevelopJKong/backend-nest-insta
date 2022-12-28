@@ -1,7 +1,7 @@
-import { DynamicModule, Global, Module } from "@nestjs/common";
-import { CONFIG_OPTIONS } from "../../common/common.constants";
-import { LoggerModuleOptions } from "./logger.interface";
-import { LoggerService } from "./logger.service";
+import { DynamicModule, Global, Module } from '@nestjs/common';
+import { CONFIG_OPTIONS } from '../../common/common.constants';
+import { LoggerModuleOptions } from './logger.interface';
+import { LoggerService } from './logger.service';
 
 @Global()
 @Module({})
@@ -12,11 +12,11 @@ export class LoggerModule {
       providers: [
         {
           provide: CONFIG_OPTIONS,
-          useValue: options
+          useValue: options,
         },
-        LoggerService
+        LoggerService,
       ],
-      exports: [LoggerService]
+      exports: [LoggerService],
     };
   }
 }
