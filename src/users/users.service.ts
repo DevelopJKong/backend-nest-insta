@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { GetUserInput, GetUserOutput } from './dtos/get-user.dto';
 import { CreateUserInput, CreateUserOutput } from './dtos/create-user.dto';
@@ -7,7 +7,6 @@ import { LoggerService } from '../libs/logger/logger.service';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { JwtService } from '../libs/jwt/jwt.service';
 import { EditProfileInput, EditProfileOutput } from './dtos/edit-profile.dto';
-import { CONFIG_OPTIONS } from "../common/common.constants";
 
 @Injectable()
 export class UsersService {
@@ -15,7 +14,6 @@ export class UsersService {
     private readonly prisma: PrismaService,
     private readonly log: LoggerService,
     private readonly jwtService: JwtService,
-
   ) {}
 
   async findById({ id }: GetUserInput): Promise<GetUserOutput> {

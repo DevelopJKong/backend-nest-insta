@@ -24,8 +24,8 @@ export class UsersResolver {
 
   @Query((_returns) => GetUserOutput)
   @RoleData([Role.USER])
-  async getUser(@Args() getUserInput: GetUserInput): Promise<GetUserOutput> {
-    return this.usersService.findById(getUserInput);
+  async getUser(@Args('input') { id }: GetUserInput): Promise<GetUserOutput> {
+    return this.usersService.findById({ id });
   }
 
   @Mutation((_returns) => EditProfileOutput)
