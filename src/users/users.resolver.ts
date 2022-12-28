@@ -13,23 +13,23 @@ import { AuthUser } from 'src/libs/auth/auth-user.decorator';
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
 
-  @Mutation((_returns) => CreateUserOutput)
+  @Mutation(_returns => CreateUserOutput)
   async createUser(@Args('input') createAccountInput: CreateUserInput): Promise<CreateUserOutput> {
     return this.usersService.createUser(createAccountInput);
   }
 
-  @Mutation((_returns) => LoginOutput)
+  @Mutation(_returns => LoginOutput)
   async login(@Args('input') loginInput: LoginInput): Promise<LoginOutput> {
     return this.usersService.login(loginInput);
   }
 
-  @Query((_returns) => GetUserOutput)
+  @Query(_returns => GetUserOutput)
   @RoleData([Role.USER])
   async getUser(@Args('input') { id }: GetUserInput): Promise<GetUserOutput> {
     return this.usersService.findById({ id });
   }
 
-  @Mutation((_returns) => EditProfileOutput)
+  @Mutation(_returns => EditProfileOutput)
   @RoleData([Role.USER])
   async editProfile(
     @AuthUser() authUser: User,

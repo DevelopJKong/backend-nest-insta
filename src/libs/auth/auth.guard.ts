@@ -26,8 +26,7 @@ export class AuthGuard implements CanActivate {
     if (!token) return false;
 
     const decoded = this.jwtService.verify(token.toString());
-    const isDecodedCheck =
-      typeof decoded !== 'object' || !Object.prototype.hasOwnProperty.call(decoded, 'id');
+    const isDecodedCheck = typeof decoded !== 'object' || !Object.prototype.hasOwnProperty.call(decoded, 'id');
 
     // ! 토큰이 유효하지 않은 경우
     if (isDecodedCheck) return false;

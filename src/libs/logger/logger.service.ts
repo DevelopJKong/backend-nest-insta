@@ -100,9 +100,7 @@ export class LoggerService {
       try {
         const callerLine = error.stack.split('\n')[2];
         const apiNameArray = callerLine.split(' ');
-        const apiName = apiNameArray.filter(
-          (item: string) => item !== null && item !== undefined && item !== '',
-        )[1];
+        const apiName = apiNameArray.filter((item: string) => item !== null && item !== undefined && item !== '')[1];
 
         // ! 의도하지 않은 extraError 일 경우 에러를 던집니다
         if (!callerLine.split('(')[1]) throw new Error(error);

@@ -7,27 +7,27 @@ registerEnumType(Role, { name: 'Role' });
 @InputType('UserInputType', { isAbstract: true })
 @ObjectType()
 export class User extends CoreEntity {
-  @Field((_type) => String)
+  @Field(_type => String)
   @IsString()
   firstName: string;
 
-  @Field((_type) => String)
+  @Field(_type => String)
   @IsString()
   lastName: string;
 
-  @Field((_type) => String)
+  @Field(_type => String)
   @IsString()
   username: string;
 
-  @Field((_type) => String)
+  @Field(_type => String)
   @IsEmail()
   email: string;
 
-  @Field((_type) => String)
+  @Field(_type => String)
   @IsString()
   password: string;
 
-  @Field((_type) => Role)
+  @Field(_type => Role)
   @IsEnum(Role)
   role: Role;
 }

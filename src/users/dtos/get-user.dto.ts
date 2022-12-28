@@ -7,6 +7,6 @@ export class GetUserInput extends PickType(User, ['id']) {}
 
 @ObjectType()
 export class GetUserOutput extends CoreOutput {
-  @Field((_returns) => User)
+  @Field(_returns => User)
   user?: User;
 }

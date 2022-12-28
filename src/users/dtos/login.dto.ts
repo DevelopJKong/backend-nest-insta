@@ -8,7 +8,7 @@ export class LoginInput extends PickType(User, ['email', 'password']) {}
 
 @ObjectType()
 export class LoginOutput extends CoreOutput {
-  @Field((_type) => String, { nullable: true })
+  @Field(_type => String, { nullable: true })
   @IsJWT()
   token?: string;
 }
