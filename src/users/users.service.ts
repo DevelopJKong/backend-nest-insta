@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import { Injectable } from "@nestjs/common";
-=======
-import { Injectable } from '@nestjs/common';
->>>>>>> bba244e4316370d6ff519e72f0e31ce1a9583272
 import { PrismaService } from '../prisma/prisma.service';
 import { GetUserInput, GetUserOutput } from './dtos/get-user.dto';
 import { CreateUserInput, CreateUserOutput } from './dtos/create-user.dto';
@@ -11,10 +7,7 @@ import { LoggerService } from '../libs/logger/logger.service';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { JwtService } from '../libs/jwt/jwt.service';
 import { EditProfileInput, EditProfileOutput } from './dtos/edit-profile.dto';
-<<<<<<< HEAD
 import { CONFIG_OPTIONS } from "../common/common.constants";
-=======
->>>>>>> bba244e4316370d6ff519e72f0e31ce1a9583272
 
 @Injectable()
 export class UsersService {
@@ -22,16 +15,10 @@ export class UsersService {
     private readonly prisma: PrismaService,
     private readonly log: LoggerService,
     private readonly jwtService: JwtService,
-<<<<<<< HEAD
 
   ) {}
 
   async findById({ id }: GetUserInput): Promise<GetUserOutput> {
-=======
-  ) {}
-
-  async getUser({ id }: GetUserInput): Promise<GetUserOutput> {
->>>>>>> bba244e4316370d6ff519e72f0e31ce1a9583272
     try {
       // ! 데이터베이스에서 유저 찾기
       const user = await this.prisma.user.findUnique({
@@ -39,7 +26,6 @@ export class UsersService {
           id,
         },
       });
-<<<<<<< HEAD
       // ! 유저가 없을 경우
       if (!user) {
         this.log.logger().error(`${this.log.loggerInfo('존재하는 유저가 없습니다')}`);
@@ -48,8 +34,6 @@ export class UsersService {
           error: '존재하는 유저가 없습니다',
         };
       }
-=======
->>>>>>> bba244e4316370d6ff519e72f0e31ce1a9583272
       // ! 유저가 있을 경우
       this.log.logger().info(`${this.log.loggerInfo('유저 찾기')}`);
       return {
