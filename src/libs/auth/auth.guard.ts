@@ -1,4 +1,4 @@
-import { Role } from '@prisma/client';
+import { RoleData } from '@prisma/client';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { AllowedRoles } from './role.decorator';
 import { ExecutionContext, Injectable, CanActivate } from '@nestjs/common';
@@ -39,7 +39,7 @@ export class AuthGuard implements CanActivate {
     gqlContext['user'] = user;
 
     // ! "USER"인 경우
-    if (roles.includes(Role.USER)) return true;
+    if (roles.includes(RoleData.USER)) return true;
 
     // * "USER"가 아닌 경우
     return roles.includes(user.role);

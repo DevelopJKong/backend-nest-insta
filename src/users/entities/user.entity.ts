@@ -1,9 +1,9 @@
 import { IsEmail, IsEnum, IsString } from 'class-validator';
 import { CoreEntity } from './../../common/entites/core.entity';
 import { InputType, ObjectType, Field, registerEnumType } from '@nestjs/graphql';
-import { Role } from '@prisma/client';
+import { RoleData } from '@prisma/client';
 
-registerEnumType(Role, { name: 'Role' });
+registerEnumType(RoleData, { name: 'Role' });
 @InputType('UserInputType', { isAbstract: true })
 @ObjectType()
 export class User extends CoreEntity {
@@ -27,9 +27,9 @@ export class User extends CoreEntity {
   @IsString()
   password: string;
 
-  @Field(_type => Role)
-  @IsEnum(Role)
-  role: Role;
+  @Field(_type => RoleData)
+  @IsEnum(RoleData)
+  role: RoleData;
 
   @Field(_type => String, { nullable: true })
   @IsString()

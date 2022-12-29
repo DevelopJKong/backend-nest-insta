@@ -1,3 +1,4 @@
+import { RoleData } from '@prisma/client';
 import { GetUserInput, GetUserOutput } from './dtos/get-user.dto';
 import { Resolver, Args, Query, Mutation } from '@nestjs/graphql';
 import { UsersService } from './users.service';
@@ -5,8 +6,7 @@ import { User } from './entities/user.entity';
 import { CreateUserInput, CreateUserOutput } from './dtos/create-user.dto';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { EditProfileInput, EditProfileOutput } from './dtos/edit-profile.dto';
-import { Role } from '@prisma/client';
-import { RoleData } from '../libs/auth/role.decorator';
+import { Role } from '../libs/auth/role.decorator';
 import { AuthUser } from 'src/libs/auth/auth-user.decorator';
 
 @Resolver((_of?: void) => User)
@@ -24,13 +24,13 @@ export class UsersResolver {
   }
 
   @Query(_returns => GetUserOutput)
-  @RoleData([Role.USER])
+  @Role([RoleData.USER])
   async getUser(@Args('input') { id }: GetUserInput): Promise<GetUserOutput> {
     return this.usersService.findById({ id });
   }
 
   @Mutation(_returns => EditProfileOutput)
-  @RoleData([Role.USER])
+  @Role([RoleData.USER])
   async editProfile(
     @AuthUser() authUser: User,
     @Args('input') editProfileInput: EditProfileInput,
