@@ -250,9 +250,9 @@ export class UsersService {
         ok: true,
       };
     } catch (error) {
-       // ! extraError
-       const { message, name, stack } = error;
-       this.log.logger().error(`${this.log.loggerInfo('extraError', message, name, stack)}`);
+      // ! extraError
+      const { message, name, stack } = error;
+      this.log.logger().error(`${this.log.loggerInfo('extraError', message, name, stack)}`);
       return {
         ok: false,
         error: 'existError',

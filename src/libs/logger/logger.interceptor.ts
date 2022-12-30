@@ -1,16 +1,27 @@
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { CallHandler, Logger, NestInterceptor, ExecutionContext } from '@nestjs/common';
-import { tap, Observable } from 'rxjs';
+import { CallHandler, NestInterceptor, ExecutionContext } from '@nestjs/common';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { LoggerService } from './logger.service';
 
-export class LoggerInterceptor implements NestInterceptor {
-  intercept(context: ExecutionContext, next: CallHandler): Observable<void> {
-    const req = GqlExecutionContext.create(context).getContext().req;
-    const method = req.method;
-    const url = req.url;
-    const userAgent = req.get('user-agent') || '';
-    const clientIp = req.ip;
+export interface Response<T> {
+  data: T;
+}
 
-    const now = Date.now();
-    return next.handle().pipe(tap(() => Logger.log(`${method} ${url} ${userAgent} ${clientIp} ${Date.now() - now}ms`)));
+export class LoggerInterceptor<T> implements NestInterceptor<T, Response<T>> {
+  constructor(private readonly log: LoggerService) {}
+  intercept(context: ExecutionContext, next: CallHandler): Observable<Response<T>> {
+    const info = GqlExecutionContext.create(context).getInfo();
+    return next.handle().pipe(
+      map(data => {
+        if (data.ok) {
+          this.log.logger().info(`${info.path.typename} => ${info.path.key}() | Success Message ::: 성공 하였습니다.`);
+        } else {
+          this.log.logger().error(`${info.path.typename} => ${info.path.key}() | Error Message ::: ${data.error}`);
+        }
+
+        return data;
+      }),
+    );
   }
 }
