@@ -1,3 +1,4 @@
+import { FollowUserInput, FollowUserOutput } from './dtos/follow-user.dto';
 import { RoleData } from '@prisma/client';
 import { GetUserInput, GetUserOutput } from './dtos/get-user.dto';
 import { Resolver, Args, Query, Mutation } from '@nestjs/graphql';
@@ -35,5 +36,14 @@ export class UsersResolver {
     @Args('input') editProfileInput: EditProfileInput,
   ): Promise<EditProfileOutput> {
     return this.usersService.editProfile(authUser.id, editProfileInput);
+  }
+
+  @Mutation(_returns => FollowUserOutput)
+  @Role([RoleData.USER])
+  async followUser(
+    @AuthUser() authUser: User,
+    @Args('input') followUserInput: FollowUserInput,
+  ): Promise<FollowUserOutput> {
+    return this.usersService.followUser(authUser.id, followUserInput);
   }
 }

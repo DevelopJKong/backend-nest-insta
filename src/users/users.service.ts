@@ -1,3 +1,4 @@
+import { FollowUserInput, FollowUserOutput } from './dtos/follow-user.dto';
 import { BACKEND_URL } from './../common/common.constants';
 import { join } from 'path';
 import { createWriteStream } from 'fs';
@@ -161,7 +162,7 @@ export class UsersService {
       if (avatarField) {
         const { createReadStream, filename } = await avatarField;
         const userFileFolder = join(fileFolder, './user');
-        
+
         // ! 개발 환경에서 파일 저장
         if (process.env.NODE_ENV === 'dev') {
           if (!fs.existsSync(userFileFolder)) {
@@ -216,6 +217,42 @@ export class UsersService {
       // ! extraError
       const { message, name, stack } = error;
       this.log.logger().error(`${this.log.loggerInfo('extraError', message, name, stack)}`);
+      return {
+        ok: false,
+        error: 'existError',
+      };
+    }
+  }
+
+  async followUser(userId: number, { username }: FollowUserInput): Promise<FollowUserOutput> {
+    try {
+      const ok = await this.prisma.user.findUnique({ where: { username } });
+      if (!ok) {
+        return {
+          ok: false,
+          error: '유저가 존재하지 않습니다',
+        };
+      }
+      await this.prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          following: {
+            connect: {
+              username,
+            },
+          },
+        },
+      });
+
+      return {
+        ok: true,
+      };
+    } catch (error) {
+       // ! extraError
+       const { message, name, stack } = error;
+       this.log.logger().error(`${this.log.loggerInfo('extraError', message, name, stack)}`);
       return {
         ok: false,
         error: 'existError',
