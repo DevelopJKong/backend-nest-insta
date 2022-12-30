@@ -1,3 +1,5 @@
+import { join } from 'path';
+import { createWriteStream } from 'fs';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { GetUserInput, GetUserOutput } from './dtos/get-user.dto';
@@ -7,6 +9,8 @@ import { LoggerService } from '../libs/logger/logger.service';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { JwtService } from '../libs/jwt/jwt.service';
 import { EditProfileInput, EditProfileOutput } from './dtos/edit-profile.dto';
+import * as fs from 'fs';
+import { fileFolder } from 'src/common/common.constants';
 
 @Injectable()
 export class UsersService {
@@ -148,9 +152,32 @@ export class UsersService {
 
   async editProfile(
     userId: number,
-    { email, password: newPassword, firstName, username, lastName, bio }: EditProfileInput,
+    { email, password: newPassword, firstName, username, lastName, bio, avatarField }: EditProfileInput,
   ): Promise<EditProfileOutput> {
     try {
+      let filePath: string;
+      let avatarFilePath: string;
+      if (avatarField) {
+        const { createReadStream, filename } = await avatarField;
+        // ! 개발 환경에서 파일 저장
+        const userFileFolder = join(fileFolder, './user');
+        
+        if (process.env.NODE_ENV === 'dev') {
+          if (!fs.existsSync(userFileFolder)) {
+            fs.mkdirSync(userFileFolder);
+          }
+          const devResult = createReadStream().pipe(createWriteStream(join(userFileFolder, `./${filename}`)));
+          filePath = devResult.path as string;
+          avatarFilePath = 'files' + filePath.split(fileFolder)[1];
+        }
+
+        // ! 배포 환경에서 파일 저장
+        if (process.env.NODE_ENV === 'prod') {
+          const prodResult = createReadStream().pipe(createWriteStream(join(userFileFolder, `./${filename}`)));
+          filePath = prodResult.path as string;
+          avatarFilePath = 'files' + filePath.split(fileFolder)[1];
+        }
+      }
       let hashedPassword: string;
       if (newPassword) {
         hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -165,6 +192,8 @@ export class UsersService {
           username,
           firstName,
           lastName,
+          bio,
+          ...(avatarFilePath && { avatar: avatarFilePath }),
           ...(hashedPassword && { password: hashedPassword }),
         },
       });

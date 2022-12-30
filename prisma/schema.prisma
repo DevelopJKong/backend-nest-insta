@@ -18,7 +18,7 @@ model User {
   email     String   @unique
   password  String
   bio       String?
-  avarar    String?
+  avatar    String?
   role      RoleData @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
