@@ -4,7 +4,7 @@ import { AppModule } from './app.module';
 import * as graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
 import * as fs from 'fs';
 import * as express from 'express';
-import { fileFolder } from './common/common.constants';
+import { BACKEND_URL, PORT, fileFolder } from './common/common.constants';
 import { join } from 'path';
 
 async function bootstrap() {
@@ -16,8 +16,7 @@ async function bootstrap() {
   app.use(graphqlUploadExpress({ maxFileSize: 1000000, maxFiles: 10 }));
   app.use('/files', express.static(join(__dirname, '../files')));
   app.enableCors();
-  const PORT = 5000;
-  const start = () => console.log(`Server Start! http://localhost:${PORT}`);
+  const start = () => console.log(`Server Start! ${BACKEND_URL}`);
   await app.listen(PORT, start);
 }
 

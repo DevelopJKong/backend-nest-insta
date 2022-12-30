@@ -1,3 +1,4 @@
+import { BACKEND_URL } from './../common/common.constants';
 import { join } from 'path';
 import { createWriteStream } from 'fs';
 import { Injectable } from '@nestjs/common';
@@ -160,7 +161,7 @@ export class UsersService {
       if (avatarField) {
         const { createReadStream, filename } = await avatarField;
         const userFileFolder = join(fileFolder, './user');
-        
+
         // ! 개발 환경에서 파일 저장
         if (process.env.NODE_ENV === 'dev') {
           if (!fs.existsSync(userFileFolder)) {
@@ -168,14 +169,14 @@ export class UsersService {
           }
           const devResult = createReadStream().pipe(createWriteStream(join(userFileFolder, `./${filename}`)));
           filePath = devResult.path as string;
-          avatarFilePath = 'files' + filePath.split(fileFolder)[1];
+          avatarFilePath = `${BACKEND_URL}` + join('/files', filePath.split(fileFolder)[1]);
         }
 
         // ! 배포 환경에서 파일 저장
         if (process.env.NODE_ENV === 'prod') {
           const prodResult = createReadStream().pipe(createWriteStream(join(userFileFolder, `./${filename}`)));
           filePath = prodResult.path as string;
-          avatarFilePath = 'files' + filePath.split(fileFolder)[1];
+          avatarFilePath = `${BACKEND_URL}` + join('/files', filePath.split(fileFolder)[1]);
         }
       }
       let hashedPassword: string;
