@@ -161,7 +161,7 @@ export class UsersService {
       if (avatarField) {
         const { createReadStream, filename } = await avatarField;
         const userFileFolder = join(fileFolder, './user');
-
+        
         // ! 개발 환경에서 파일 저장
         if (process.env.NODE_ENV === 'dev') {
           if (!fs.existsSync(userFileFolder)) {

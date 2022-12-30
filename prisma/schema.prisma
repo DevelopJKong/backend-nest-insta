@@ -20,8 +20,11 @@ model User {
   bio       String?
   avatar    String?
   role      RoleData @default(USER)
+  followers User[]   @relation("FollowRelation")
+  following User[]   @relation("FollowRelation")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  userId    Int?
 }
 
 enum RoleData {
