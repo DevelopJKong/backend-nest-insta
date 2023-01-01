@@ -13,6 +13,7 @@ import { JwtService } from '../libs/jwt/jwt.service';
 import { EditProfileInput, EditProfileOutput } from './dtos/edit-profile.dto';
 import * as fs from 'fs';
 import { fileFolder } from 'src/common/common.constants';
+import { UnFollowUserInput, UnFollowUserOutput } from './dtos/unfollow-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -28,6 +29,10 @@ export class UsersService {
       const user = await this.prisma.user.findUnique({
         where: {
           id,
+        },
+        include: {
+          following: true,
+          followers: true,
         },
       });
       // ! 유저가 없을 경우
@@ -63,6 +68,9 @@ export class UsersService {
           OR: [
             {
               username,
+            },
+            {
+              email,
             },
           ],
         },
@@ -228,6 +236,8 @@ export class UsersService {
     try {
       const ok = await this.prisma.user.findUnique({ where: { username } });
       if (!ok) {
+        // ! 유저가 없을 경우
+        this.log.logger().error(`${this.log.loggerInfo('유저가 없을 경우')}`);
         return {
           ok: false,
           error: '유저가 존재하지 않습니다',
@@ -245,7 +255,49 @@ export class UsersService {
           },
         },
       });
+      // * 팔로우 완료
+      this.log.logger().info(`${this.log.loggerInfo('팔로우 완료')}`);
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      // ! extraError
+      const { message, name, stack } = error;
+      this.log.logger().error(`${this.log.loggerInfo('extraError', message, name, stack)}`);
+      return {
+        ok: false,
+        error: 'existError',
+      };
+    }
+  }
 
+  async unFollowUser(userId: number, { username }: UnFollowUserInput): Promise<UnFollowUserOutput> {
+    try {
+      const ok = await this.prisma.user.findUnique({ where: { username } });
+      if (!ok) {
+        // ! 유저가 없을 경우
+        this.log.logger().error(`${this.log.loggerInfo('유저가 없을 경우')}`);
+        return {
+          ok: false,
+          error: '언팔로우 할수 없습니다.',
+        };
+      }
+
+      await this.prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          following: {
+            disconnect: {
+              username,
+            },
+          },
+        },
+      });
+
+      // * 언팔로우 완료
+      this.log.logger().info(`${this.log.loggerInfo('언팔로우 완료')}`);
       return {
         ok: true,
       };

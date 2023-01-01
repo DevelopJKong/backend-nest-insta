@@ -9,6 +9,7 @@ import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { EditProfileInput, EditProfileOutput } from './dtos/edit-profile.dto';
 import { Role } from '../libs/auth/role.decorator';
 import { AuthUser } from 'src/libs/auth/auth-user.decorator';
+import { UnFollowUserInput, UnFollowUserOutput } from './dtos/unfollow-user.dto';
 @Resolver((_of?: void) => User)
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
@@ -45,5 +46,11 @@ export class UsersResolver {
     @Args('input') followUserInput: FollowUserInput,
   ): Promise<FollowUserOutput> {
     return this.usersService.followUser(authUser.id, followUserInput);
+  }
+
+  @Mutation(_returns => UnFollowUserOutput)
+  @Role([RoleData.USER])
+  async unFollowUser(@AuthUser() authUser: User, @Args('input') unFollowUserInput: UnFollowUserInput) {
+    return this.usersService.unFollowUser(authUser.id, unFollowUserInput);
   }
 }
