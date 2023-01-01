@@ -27,6 +27,8 @@ export class UsersService {
   ) {}
 
   async totalFollowing(id: number): Promise<number> {
+    // ! 팔로잉 수
+    this.log.logger().info(`${this.log.loggerInfo('팔로잉 수')}`);
     return this.prisma.user
       .count({
         where: {
@@ -42,6 +44,8 @@ export class UsersService {
   }
 
   async totalFollowers(id: number): Promise<number> {
+    // ! 팔로워 수
+    this.log.logger().info(`${this.log.loggerInfo('팔로워 수')}`);
     return this.prisma.user
       .count({
         where: {
@@ -60,10 +64,33 @@ export class UsersService {
     if (!user) {
       return false;
     }
+    // ! 내 계정인지 확인
+    this.log.logger().info(`${this.log.loggerInfo('내 계정인지 확인')}`);
     return id === user.id;
   }
 
-  async findById({ id }: GetUserInput): Promise<GetUserOutput> {
+  isFollowing(user: User, id: number): Promise<boolean> | boolean {
+    if (!user) {
+      return false;
+    }
+    // ! 팔로잉 여부 확인
+    this.log.logger().info(`${this.log.loggerInfo('팔로잉 여부 확인')}`);
+    return this.prisma.user
+      .count({
+        where: {
+          username: user.username,
+          following: {
+            some: {
+              id,
+            },
+          },
+        },
+      })
+      .then(res => Boolean(res))
+      .catch(error => error && false);
+  }
+
+  async findById(userId: number, { id }: GetUserInput): Promise<GetUserOutput> {
     try {
       // ! 데이터베이스에서 유저 찾기
       const user = await this.prisma.user.findUnique({
@@ -77,6 +104,8 @@ export class UsersService {
       });
       const totalFollowing = await this.totalFollowing(id);
       const totalFollowers = await this.totalFollowers(id);
+      const isMe = this.isMe(user, userId);
+      const isFollowing = await this.isFollowing(user, userId);
       // ! 유저가 없을 경우
       if (!user) {
         this.log.logger().error(`${this.log.loggerInfo('존재하는 유저가 없습니다')}`);
@@ -92,6 +121,8 @@ export class UsersService {
         user,
         totalFollowing,
         totalFollowers,
+        isMe,
+        isFollowing,
       };
     } catch (error) {
       // ! extraError

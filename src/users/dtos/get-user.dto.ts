@@ -18,4 +18,7 @@ export class GetUserOutput extends CoreOutput {
 
   @Field(_return => Boolean, { nullable: true })
   isMe?: boolean;
+
+  @Field(_return => Boolean, { nullable: true })
+  isFollowing?: boolean;
 }

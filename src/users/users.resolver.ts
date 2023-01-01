@@ -28,8 +28,8 @@ export class UsersResolver {
 
   @Query(_returns => GetUserOutput)
   @Role([RoleData.USER])
-  async getUser(@Args('input') { id }: GetUserInput): Promise<GetUserOutput> {
-    return this.usersService.findById({ id });
+  async getUser(@AuthUser() authUser: User, @Args('input') { id }: GetUserInput): Promise<GetUserOutput> {
+    return this.usersService.findById(authUser.id, { id });
   }
 
   @Mutation(_returns => EditProfileOutput)
@@ -80,5 +80,10 @@ export class UsersResolver {
   @ResolveField(_type => Boolean)
   isMe(@AuthUser() authUser: User, @Parent() user: User): boolean {
     return this.usersService.isMe(authUser, user.id);
+  }
+
+  @ResolveField(_type => Boolean)
+  isFollowing(@AuthUser() authUser: User, @Parent() user: User): Promise<boolean> | boolean {
+    return this.usersService.isFollowing(authUser, user.id);
   }
 }
