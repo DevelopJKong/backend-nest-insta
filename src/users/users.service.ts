@@ -1,3 +1,4 @@
+import { SeeFollowingOutput, SeeFollowingInput } from './dtos/see-following.dto';
 import { SeeFollowersInput, SeeFollowersOutput } from './dtos/see-followers.dto';
 import { FollowUserInput, FollowUserOutput } from './dtos/follow-user.dto';
 import { BACKEND_URL } from './../common/common.constants';
@@ -335,6 +336,39 @@ export class UsersService {
         ok: true,
         followers,
         totalPages: Math.ceil(totalFollowers / 5),
+      };
+    } catch (error) {
+      // ! extraError
+      const { message, name, stack } = error;
+      this.log.logger().error(`${this.log.loggerInfo('extraError', message, name, stack)}`);
+      return {
+        ok: false,
+        error: 'existError',
+      };
+    }
+  }
+
+  async seeFollowing(userId: number, { username, lastId }: SeeFollowingInput): Promise<SeeFollowingOutput> {
+    try {
+      const ok = await this.prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
+      if (!ok) {
+        // ! 유저가 없을 경우
+        this.log.logger().error(`${this.log.loggerInfo('유저가 없을 경우')}`);
+        return {
+          ok: false,
+          error: '유저가 존재 하지 않습니다',
+        };
+      }
+      const following = await this.prisma.user.findUnique({ where: { username } }).following({
+        take: 5,
+        skip: lastId ? 1 : 0,
+        ...(lastId && { cursor: { id: lastId } }),
+      });
+      // * 팔로잉 조회 완료
+      this.log.logger().info(`${this.log.loggerInfo('팔로잉 조회 완료')}`);
+      return {
+        ok: true,
+        following,
       };
     } catch (error) {
       // ! extraError

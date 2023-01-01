@@ -11,6 +11,7 @@ import { EditProfileInput, EditProfileOutput } from './dtos/edit-profile.dto';
 import { Role } from '../libs/auth/role.decorator';
 import { AuthUser } from 'src/libs/auth/auth-user.decorator';
 import { UnFollowUserInput, UnFollowUserOutput } from './dtos/un-follow-user.dto';
+import { SeeFollowingOutput, SeeFollowingInput } from './dtos/see-following.dto';
 @Resolver((_of?: void) => User)
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
@@ -59,5 +60,11 @@ export class UsersResolver {
   @Role([RoleData.USER])
   async seeFollowers(@AuthUser() authUser: User, @Args('input') seeFollowersInput: SeeFollowersInput) {
     return this.usersService.seeFollowers(authUser.id, seeFollowersInput);
+  }
+
+  @Query(_returns => SeeFollowingOutput)
+  @Role([RoleData.USER])
+  async seeFollowing(@AuthUser() authUser: User, @Args('input') seeFollowingInput: SeeFollowingInput) {
+    return this.usersService.seeFollowing(authUser.id, seeFollowingInput);
   }
 }
