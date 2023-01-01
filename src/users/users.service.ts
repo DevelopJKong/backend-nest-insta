@@ -16,6 +16,7 @@ import { EditProfileInput, EditProfileOutput } from './dtos/edit-profile.dto';
 import * as fs from 'fs';
 import { fileFolder } from 'src/common/common.constants';
 import { UnFollowUserInput, UnFollowUserOutput } from './dtos/un-follow-user.dto';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
@@ -24,6 +25,43 @@ export class UsersService {
     private readonly log: LoggerService,
     private readonly jwtService: JwtService,
   ) {}
+
+  async totalFollowing(id: number): Promise<number> {
+    return this.prisma.user
+      .count({
+        where: {
+          followers: {
+            some: {
+              id,
+            },
+          },
+        },
+      })
+      .then(res => res)
+      .catch(error => error && 0);
+  }
+
+  async totalFollowers(id: number): Promise<number> {
+    return this.prisma.user
+      .count({
+        where: {
+          following: {
+            some: {
+              id,
+            },
+          },
+        },
+      })
+      .then(res => res)
+      .catch(error => error && 0);
+  }
+
+  isMe(user: User, id: number): boolean {
+    if (!user) {
+      return false;
+    }
+    return id === user.id;
+  }
 
   async findById({ id }: GetUserInput): Promise<GetUserOutput> {
     try {
@@ -37,6 +75,8 @@ export class UsersService {
           followers: true,
         },
       });
+      const totalFollowing = await this.totalFollowing(id);
+      const totalFollowers = await this.totalFollowers(id);
       // ! 유저가 없을 경우
       if (!user) {
         this.log.logger().error(`${this.log.loggerInfo('존재하는 유저가 없습니다')}`);
@@ -50,6 +90,8 @@ export class UsersService {
       return {
         ok: true,
         user,
+        totalFollowing,
+        totalFollowers,
       };
     } catch (error) {
       // ! extraError

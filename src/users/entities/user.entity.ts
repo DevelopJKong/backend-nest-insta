@@ -43,4 +43,16 @@ export class User extends CoreEntity {
 
   @Field(_type => [User])
   followers?: User[];
+
+  @Field(_type => Number, { nullable: true })
+  totalFollowing?: number;
+
+  @Field(_type => Number, { nullable: true })
+  totalFollowers?: number;
+
+  @Field(_type => Boolean, { nullable: true })
+  isFollowing?: boolean;
+
+  @Field(_type => Boolean, { nullable: true })
+  isMe?: boolean;
 }
