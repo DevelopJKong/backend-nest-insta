@@ -57,7 +57,7 @@ export class UsersResolver {
 
   @Query(_returns => SeeFollowersOutput)
   @Role([RoleData.USER])
-  async seeFollowers(@Args('input') seeFollowersInput: SeeFollowersInput) {
-    return this.usersService.seeFollowers(seeFollowersInput);
+  async seeFollowers(@AuthUser() authUser: User, @Args('input') seeFollowersInput: SeeFollowersInput) {
+    return this.usersService.seeFollowers(authUser.id, seeFollowersInput);
   }
 }

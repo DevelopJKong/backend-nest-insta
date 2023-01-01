@@ -312,18 +312,34 @@ export class UsersService {
       };
     }
   }
-  async seeFollowers({ username, page }: SeeFollowersInput): Promise<SeeFollowersOutput> {
+  async seeFollowers(userId: number, { username, page }: SeeFollowersInput): Promise<SeeFollowersOutput> {
     try {
+      const ok = await this.prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
+      if (!ok) {
+        // ! 유저가 없을 경우
+        this.log.logger().error(`${this.log.loggerInfo('유저가 없을 경우')}`);
+        return {
+          ok: false,
+          error: '유저가 존재 하지 않습니다',
+        };
+      }
       const followers = await this.prisma.user.findUnique({ where: { username } }).followers({
         take: 5,
         skip: (page - 1) * 5,
       });
 
+      const totalFollowers = await this.prisma.user.count({ where: { following: { some: { username } } } });
+      // * 팔로워 조회 완료
+      this.log.logger().info(`${this.log.loggerInfo('팔로워 조회 완료')}`);
       return {
         ok: true,
         followers,
+        totalPages: Math.ceil(totalFollowers / 5),
       };
     } catch (error) {
+      // ! extraError
+      const { message, name, stack } = error;
+      this.log.logger().error(`${this.log.loggerInfo('extraError', message, name, stack)}`);
       return {
         ok: false,
         error: 'existError',
