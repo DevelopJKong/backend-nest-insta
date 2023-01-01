@@ -1,3 +1,4 @@
+import { SeeFollowersOutput, SeeFollowersInput } from './dtos/see-followers.dto';
 import { FollowUserInput, FollowUserOutput } from './dtos/follow-user.dto';
 import { RoleData } from '@prisma/client';
 import { GetUserInput, GetUserOutput } from './dtos/get-user.dto';
@@ -52,5 +53,11 @@ export class UsersResolver {
   @Role([RoleData.USER])
   async unFollowUser(@AuthUser() authUser: User, @Args('input') unFollowUserInput: UnFollowUserInput) {
     return this.usersService.unFollowUser(authUser.id, unFollowUserInput);
+  }
+
+  @Query(_returns => SeeFollowersOutput)
+  @Role([RoleData.USER])
+  async seeFollowers(@Args('input') seeFollowersInput: SeeFollowersInput) {
+    return this.usersService.seeFollowers(seeFollowersInput);
   }
 }

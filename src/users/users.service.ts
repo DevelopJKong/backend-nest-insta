@@ -1,3 +1,4 @@
+import { SeeFollowersInput, SeeFollowersOutput } from './dtos/see-followers.dto';
 import { FollowUserInput, FollowUserOutput } from './dtos/follow-user.dto';
 import { BACKEND_URL } from './../common/common.constants';
 import { join } from 'path';
@@ -311,5 +312,22 @@ export class UsersService {
       };
     }
   }
-  // async seeFollowers(userId: number, { page }: SeeFollowersInput): Promise<SeeFollowersOutput> {}
+  async seeFollowers({ username, page }: SeeFollowersInput): Promise<SeeFollowersOutput> {
+    try {
+      const followers = await this.prisma.user.findUnique({ where: { username } }).followers({
+        take: 5,
+        skip: (page - 1) * 5,
+      });
+
+      return {
+        ok: true,
+        followers,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: 'existError',
+      };
+    }
+  }
 }
