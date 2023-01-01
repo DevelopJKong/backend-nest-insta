@@ -1,3 +1,4 @@
+import { SearchUsersInput, SearchUsersOutput } from './dtos/search-users.dto';
 import { SeeFollowersOutput, SeeFollowersInput } from './dtos/see-followers.dto';
 import { FollowUserInput, FollowUserOutput } from './dtos/follow-user.dto';
 import { RoleData } from '@prisma/client';
@@ -66,6 +67,12 @@ export class UsersResolver {
   @Role([RoleData.USER])
   async seeFollowing(@AuthUser() authUser: User, @Args('input') seeFollowingInput: SeeFollowingInput) {
     return this.usersService.seeFollowing(authUser.id, seeFollowingInput);
+  }
+
+  @Query(_returns => SearchUsersOutput)
+  @Role([RoleData.USER])
+  async searchUsers(@AuthUser() authUser: User, @Args('input') searchUserInput: SearchUsersInput) {
+    return this.usersService.searchUsers(authUser.id, searchUserInput);
   }
 
   @ResolveField(_type => Int)

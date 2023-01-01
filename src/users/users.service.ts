@@ -17,6 +17,7 @@ import * as fs from 'fs';
 import { fileFolder } from 'src/common/common.constants';
 import { UnFollowUserInput, UnFollowUserOutput } from './dtos/un-follow-user.dto';
 import { User } from './entities/user.entity';
+import { SearchUsersInput, SearchUsersOutput } from './dtos/search-users.dto';
 
 @Injectable()
 export class UsersService {
@@ -452,5 +453,43 @@ export class UsersService {
         error: 'existError',
       };
     }
+  }
+
+  async searchUsers(userId: number, { keyword }: SearchUsersInput): Promise<SearchUsersOutput> {
+    try {
+      // ! 데이터베이스에서 유저들 찾기
+      const users = await this.prisma.user.findMany({
+        where: {
+          username: {
+            startsWith: keyword.toLowerCase(),
+          },
+        },
+      });
+
+      // ! 데이터베이스에서 유저 찾기
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+        include: {
+          following: true,
+          followers: true,
+        },
+      });
+
+      const totalFollowing = await this.totalFollowing(userId);
+      const totalFollowers = await this.totalFollowers(userId);
+      const isMe = this.isMe(user, userId);
+      const isFollowing = await this.isFollowing(user, userId);
+      
+      return {
+        ok: true,
+        users,
+        totalFollowing,
+        totalFollowers,
+        isMe,
+        isFollowing,
+      };
+    } catch (error) {}
   }
 }
