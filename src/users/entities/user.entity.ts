@@ -38,9 +38,9 @@ export class User extends CoreEntity {
   @Field(_type => String, { nullable: true })
   avatar?: string;
 
-  @Field(_type => User, { nullable: true })
+  @Field(_type => [User])
   following?: User[];
 
-  @Field(_type => User, { nullable: true })
+  @Field(_type => [User])
   followers?: User[];
 }

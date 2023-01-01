@@ -13,7 +13,7 @@ import { JwtService } from '../libs/jwt/jwt.service';
 import { EditProfileInput, EditProfileOutput } from './dtos/edit-profile.dto';
 import * as fs from 'fs';
 import { fileFolder } from 'src/common/common.constants';
-import { UnFollowUserInput, UnFollowUserOutput } from './dtos/unfollow-user.dto';
+import { UnFollowUserInput, UnFollowUserOutput } from './dtos/un-follow-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -311,4 +311,5 @@ export class UsersService {
       };
     }
   }
+  // async seeFollowers(userId: number, { page }: SeeFollowersInput): Promise<SeeFollowersOutput> {}
 }
