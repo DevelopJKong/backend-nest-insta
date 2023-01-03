@@ -8,6 +8,8 @@ import { LoggerModule } from './libs/logger/logger.module';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { JwtModule } from './libs/jwt/jwt.module';
+import { PhotosModule } from './photos/photos.module';
+import { HashtagsModule } from './hashtags/hashtags.module';
 @Module({
   imports: [
     // ! 피리즈마 설정 모듈
@@ -43,7 +45,7 @@ import { JwtModule } from './libs/jwt/jwt.module';
       privateKey: process.env.PRIVATE_KEY,
     }),
     UsersModule, // ! 유저 모듈
-    AuthModule, // ! 인증 모듈
+    AuthModule, PhotosModule, HashtagsModule, // ! 인증 모듈
   ],
   providers: [],
 })
