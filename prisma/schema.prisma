@@ -25,9 +25,30 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   userId    Int?
+  photos    Photo[]
 }
 
 enum RoleData {
   USER
   ADMIN
+}
+
+model Photo {
+  id        Int       @id @default(autoincrement())
+  user      User      @relation(fields: [userId], references: [id])
+  userId    Int
+  file      String
+  caption   String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  hashtags   Hashtag[]
+  hashtagId Int?
+}
+
+model Hashtag {
+  id        Int      @id @default(autoincrement())
+  hashtag   String   @unique
+  photos    Photo[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
