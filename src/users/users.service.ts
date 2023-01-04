@@ -481,7 +481,7 @@ export class UsersService {
       const totalFollowers = await this.totalFollowers(userId);
       const isMe = this.isMe(user, userId);
       const isFollowing = await this.isFollowing(user, userId);
-      
+
       return {
         ok: true,
         users,

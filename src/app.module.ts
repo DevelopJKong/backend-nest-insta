@@ -45,7 +45,9 @@ import { HashtagsModule } from './hashtags/hashtags.module';
       privateKey: process.env.PRIVATE_KEY,
     }),
     UsersModule, // ! 유저 모듈
-    AuthModule, PhotosModule, HashtagsModule, // ! 인증 모듈
+    AuthModule,
+    PhotosModule,
+    HashtagsModule, // ! 인증 모듈
   ],
   providers: [],
 })

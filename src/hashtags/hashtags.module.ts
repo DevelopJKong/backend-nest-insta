@@ -3,6 +3,6 @@ import { HashtagsService } from './hashtags.service';
 import { HashtagsResolver } from './hashtags.resolver';
 
 @Module({
-  providers: [HashtagsService, HashtagsResolver]
+  providers: [HashtagsService, HashtagsResolver],
 })
 export class HashtagsModule {}

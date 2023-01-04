@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class PhotosService {
-  async uploadPhoto(userId: number, { file, caption }: UploadPhotoInput): Promise<UploadPhotoOutput> {
+  async uploadPhoto(userId: number, { photoFile, caption }: UploadPhotoInput): Promise<UploadPhotoOutput> {
     try {
       if (caption) {
         // ! parse caption
