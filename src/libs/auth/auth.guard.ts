@@ -31,7 +31,9 @@ export class AuthGuard implements CanActivate {
     // ! 토큰이 유효하지 않은 경우
     if (isDecodedCheck) return false;
 
-    const { user } = await this.usersService.findById(decoded['id'], { id: decoded['id'] });
+    const { user } = await this.usersService.findById(decoded['id'], {
+      id: decoded['id'],
+    });
 
     // ! 유저가 없는 경우
     if (!user) return false;

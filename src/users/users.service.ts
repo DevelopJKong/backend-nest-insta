@@ -389,7 +389,10 @@ export class UsersService {
   }
   async seeFollowers(userId: number, { username, page }: SeeFollowersInput): Promise<SeeFollowersOutput> {
     try {
-      const ok = await this.prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
+      const ok = await this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true },
+      });
       if (!ok) {
         // ! 유저가 없을 경우
         this.log.logger().error(`${this.log.loggerInfo('유저가 없을 경우')}`);
@@ -403,7 +406,9 @@ export class UsersService {
         skip: (page - 1) * 5,
       });
 
-      const totalFollowers = await this.prisma.user.count({ where: { following: { some: { username } } } });
+      const totalFollowers = await this.prisma.user.count({
+        where: { following: { some: { username } } },
+      });
       // * 팔로워 조회 완료
       this.log.logger().info(`${this.log.loggerInfo('팔로워 조회 완료')}`);
       return {
@@ -424,7 +429,10 @@ export class UsersService {
 
   async seeFollowing(userId: number, { username, lastId }: SeeFollowingInput): Promise<SeeFollowingOutput> {
     try {
-      const ok = await this.prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
+      const ok = await this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true },
+      });
       if (!ok) {
         // ! 유저가 없을 경우
         this.log.logger().error(`${this.log.loggerInfo('유저가 없을 경우')}`);
