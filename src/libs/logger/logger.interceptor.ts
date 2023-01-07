@@ -20,13 +20,21 @@ export class LoggerInterceptor<T> implements NestInterceptor<T, Response<T>> {
         } else {
           const { message, stack, name } = data.error;
 
-          this.log
-            .logger()
-            .error(
-              `${info.path.typename} => ${info.path.key}() | Error Message ::: ${message} | Error Name ::: ${name} | Error Stack ::: ${stack}`,
-            );
-
-          data.error = message;
+          if (message.includes('Error:')) {
+            // ! server error & query error
+            this.log
+              .logger()
+              .error(`${info.path.typename} => ${info.path.key}() | Name ::: ${name} | Message ::: ${message}`);
+            data.error = `${info.path.typename} => ${info.path.key}() | Name ::: ${name} | 로그 메시지 참고`;
+          } else {
+            // ! client error
+            this.log
+              .logger()
+              .error(
+                `${info.path.typename} => ${info.path.key}() | Message ::: ${message} | Name ::: ${name} | Stack ::: ${stack}`,
+              );
+            data.error = message;
+          }
         }
         return data;
       }),

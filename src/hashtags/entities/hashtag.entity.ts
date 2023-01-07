@@ -8,6 +8,6 @@ export class Hashtag extends CoreEntity {
   @Field(_type => String)
   hashtag: string;
 
-  @Field(_type => [Photo])
-  photos: Photo[];
+  @Field(_type => [Photo], { nullable: true })
+  photos?: Photo[];
 }
