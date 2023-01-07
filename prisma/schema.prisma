@@ -41,7 +41,7 @@ model Photo {
   caption   String?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  hashtags   Hashtag[]
+  hashtags  Hashtag[]
   hashtagId Int?
 }
 

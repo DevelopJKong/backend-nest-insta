@@ -1,14 +1,15 @@
 {
-    "sqltools.connections": [
-        {
-            "previewLimit": 50,
-            "server": "localhost",
-            "port": 5432,
-            "driver": "PostgreSQL",
-            "name": "main",
-            "database": "instaclone-nest",
-            "username": "postgres",
-            "password": "1234"
-        }
-    ]
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "name": "main",
+      "database": "instaclone-nest",
+      "username": "postgres",
+      "password": "1234"
+    }
+  ],
+  "editor.formatOnSave": true
 }
