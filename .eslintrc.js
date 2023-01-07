@@ -49,16 +49,16 @@ module.exports = {
     'no-duplicate-imports': 'error', // ! 중복된 import를 사용하면 에러를 발생시킵니다.
     '@typescript-eslint/no-empty-function': 'warn', // ! 빈 함수를 사용하면 경고를 발생시킵니다.
     // ! ts-ignore, ts-expect-error, ts-nocheck, ts-check를 사용하면 에러를 발생시킵니다.
-    '@typescript-eslint/ban-ts-comment': [
-      'error',
-      {
-        'ts-expect-error': 'allow-with-description',
-        'ts-ignore': 'allow-with-description',
-        'ts-nocheck': 'allow-with-description',
-        'ts-check': 'allow-with-description',
-        minimumDescriptionLength: 3,
-      },
-    ],
+    // '@typescript-eslint/ban-ts-comment': [
+    //   'error',
+    //   {
+    //     'ts-expect-error': 'allow-with-description',
+    //     'ts-ignore': 'allow-with-description',
+    //     'ts-nocheck': 'allow-with-description',
+    //     'ts-check': 'allow-with-description',
+    //     minimumDescriptionLength: 3,
+    //   },
+    // ],
     '@typescript-eslint/explicit-member-accessibility': 'off', // ! 클래스 멤버 접근 제한자를 사용하지 않으면 경고를 발생시킵니다.
     '@typescript-eslint/explicit-function-return-type': 'off', // ! 함수의 반환 타입을 명시하지 않으면 경고를 발생시킵니다.
     '@typescript-eslint/no-parameter-properties': 'off', // ! 생성자의 매개변수에 접근 제한자를 사용하지 않으면 경고를 발생시킵니다.

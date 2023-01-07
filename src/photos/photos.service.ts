@@ -43,7 +43,7 @@ export class PhotosService {
     } catch (error) {
       return {
         ok: false,
-        error: 'extraError',
+        error: new Error(error),
       };
     }
   }

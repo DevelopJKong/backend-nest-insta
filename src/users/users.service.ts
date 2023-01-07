@@ -109,17 +109,16 @@ export class UsersService {
       const isFollowing = await this.isFollowing(user, userId);
       // ! 유저가 없을 경우
       if (!user) {
-        this.log.logger().error(`${this.log.loggerInfo('존재하는 유저가 없습니다')}`);
         return {
           ok: false,
-          error: '존재하는 유저가 없습니다',
+          error: new Error('존재하는 유저가 없습니다'),
         };
       }
       // * 유저가 있을 경우
-      this.log.logger().info(`${this.log.loggerInfo('유저 찾기')}`);
       return {
         ok: true,
         user,
+        message: '유저 찾기',
         totalFollowing,
         totalFollowers,
         isMe,
@@ -127,11 +126,9 @@ export class UsersService {
       };
     } catch (error) {
       // ! extraError
-      const { message, name, stack } = error;
-      this.log.logger().error(`${this.log.loggerInfo('extraError', message, name, stack)}`);
       return {
         ok: false,
-        error: 'User not found',
+        error: new Error(error),
       };
     }
   }
@@ -145,18 +142,17 @@ export class UsersService {
             {
               username,
             },
-            {
-              email,
-            },
+            // {
+            //   email,
+            // },
           ],
         },
       });
       if (exists) {
         // ! 유저 네임이 이미 존재할 경우
-        this.log.logger().error(`${this.log.loggerInfo('유저 네임이 이미 존재할 경우')}`);
         return {
           ok: false,
-          error: 'existError',
+          error: new Error('유저 네임이 이미 존재할 경우'),
         };
       }
 
@@ -173,17 +169,15 @@ export class UsersService {
       });
 
       // * 유저 생성 완료
-      this.log.logger().info(`${this.log.loggerInfo('유저 생성 완료')}`);
       return {
         ok: true,
+        message: '유저 생성 완료',
       };
     } catch (error) {
       // ! extraError
-      const { message, name, stack } = error;
-      this.log.logger().error(`${this.log.loggerInfo('extraError', message, name, stack)}`);
       return {
         ok: false,
-        error: 'Could not create account',
+        error: new Error(error),
       };
     }
   }
@@ -199,10 +193,9 @@ export class UsersService {
 
       // ! 유저가 없을 경우
       if (!user) {
-        this.log.logger().error(`${this.log.loggerInfo('유저가 없을 경우')}`);
         return {
           ok: false,
-          error: 'User not found',
+          error: new Error('유저가 없을 경우'),
         };
       }
 
@@ -211,27 +204,25 @@ export class UsersService {
 
       // ! 비밀번호가 틀릴 경우
       if (!passwordOk) {
-        this.log.logger().error(`${this.log.loggerInfo('비밀번호가 틀릴 경우')}`);
         return {
           ok: false,
-          error: 'Wrong password',
+          error: new Error('비밀번호가 틀릴 경우'),
         };
       }
 
       const token = this.jwtService.sign({ id: user.id });
       // * 로그인 성공
-      this.log.logger().info(`${this.log.loggerInfo('로그인 성공')}`);
       return {
         ok: true,
+        message: '로그인 성공',
         token,
       };
     } catch (error) {
       // ! extraError
-      const { message, name, stack } = error;
-      this.log.logger().error(`${this.log.loggerInfo('extraError', message, name, stack)}`);
+
       return {
         ok: false,
-        error: 'existError',
+        error: new Error(error),
       };
     }
   }
@@ -285,10 +276,9 @@ export class UsersService {
       });
       if (!updatedUser.id) {
         // ! 유저가 없을 경우
-        this.log.logger().error(`${this.log.loggerInfo('유저가 없을 경우')}`);
         return {
           ok: false,
-          error: 'updateError',
+          error: new Error('유저가 없을 경우'),
         };
       }
 
@@ -299,11 +289,9 @@ export class UsersService {
       };
     } catch (error) {
       // ! extraError
-      const { message, name, stack } = error;
-      this.log.logger().error(`${this.log.loggerInfo('extraError', message, name, stack)}`);
       return {
         ok: false,
-        error: 'existError',
+        error: new Error(error),
       };
     }
   }
@@ -313,10 +301,9 @@ export class UsersService {
       const ok = await this.prisma.user.findUnique({ where: { username } });
       if (!ok) {
         // ! 유저가 없을 경우
-        this.log.logger().error(`${this.log.loggerInfo('유저가 없을 경우')}`);
         return {
           ok: false,
-          error: '유저가 존재하지 않습니다',
+          error: new Error('유저가 없을 경우'),
         };
       }
       await this.prisma.user.update({
@@ -332,17 +319,15 @@ export class UsersService {
         },
       });
       // * 팔로우 완료
-      this.log.logger().info(`${this.log.loggerInfo('팔로우 완료')}`);
       return {
         ok: true,
+        message: '팔로우 완료',
       };
     } catch (error) {
       // ! extraError
-      const { message, name, stack } = error;
-      this.log.logger().error(`${this.log.loggerInfo('extraError', message, name, stack)}`);
       return {
         ok: false,
-        error: 'existError',
+        error: new Error(error),
       };
     }
   }
@@ -352,10 +337,9 @@ export class UsersService {
       const ok = await this.prisma.user.findUnique({ where: { username } });
       if (!ok) {
         // ! 유저가 없을 경우
-        this.log.logger().error(`${this.log.loggerInfo('유저가 없을 경우')}`);
         return {
           ok: false,
-          error: '언팔로우 할수 없습니다.',
+          error: new Error('언팔로우 할수 없습니다.'),
         };
       }
 
@@ -379,11 +363,9 @@ export class UsersService {
       };
     } catch (error) {
       // ! extraError
-      const { message, name, stack } = error;
-      this.log.logger().error(`${this.log.loggerInfo('extraError', message, name, stack)}`);
       return {
         ok: false,
-        error: 'existError',
+        error: new Error(error),
       };
     }
   }
@@ -395,10 +377,9 @@ export class UsersService {
       });
       if (!ok) {
         // ! 유저가 없을 경우
-        this.log.logger().error(`${this.log.loggerInfo('유저가 없을 경우')}`);
         return {
           ok: false,
-          error: '유저가 존재 하지 않습니다',
+          error: new Error('유저가 존재 하지 않습니다'),
         };
       }
       const followers = await this.prisma.user.findUnique({ where: { username } }).followers({
@@ -410,19 +391,17 @@ export class UsersService {
         where: { following: { some: { username } } },
       });
       // * 팔로워 조회 완료
-      this.log.logger().info(`${this.log.loggerInfo('팔로워 조회 완료')}`);
       return {
         ok: true,
         followers,
         totalPages: Math.ceil(totalFollowers / 5),
+        message: '팔로워 조회 완료',
       };
     } catch (error) {
       // ! extraError
-      const { message, name, stack } = error;
-      this.log.logger().error(`${this.log.loggerInfo('extraError', message, name, stack)}`);
       return {
         ok: false,
-        error: 'existError',
+        error: new Error(error),
       };
     }
   }
@@ -435,10 +414,9 @@ export class UsersService {
       });
       if (!ok) {
         // ! 유저가 없을 경우
-        this.log.logger().error(`${this.log.loggerInfo('유저가 없을 경우')}`);
         return {
           ok: false,
-          error: '유저가 존재 하지 않습니다',
+          error: new Error('유저가 존재 하지 않습니다'),
         };
       }
       const following = await this.prisma.user.findUnique({ where: { username } }).following({
@@ -454,11 +432,9 @@ export class UsersService {
       };
     } catch (error) {
       // ! extraError
-      const { message, name, stack } = error;
-      this.log.logger().error(`${this.log.loggerInfo('extraError', message, name, stack)}`);
       return {
         ok: false,
-        error: 'existError',
+        error: new Error(error),
       };
     }
   }

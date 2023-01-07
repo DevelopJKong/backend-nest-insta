@@ -15,11 +15,19 @@ export class LoggerInterceptor<T> implements NestInterceptor<T, Response<T>> {
     return next.handle().pipe(
       map(data => {
         if (data.ok) {
-          this.log.logger().info(`${info.path.typename} => ${info.path.key}() | Success Message ::: 성공 하였습니다.`);
+          data.error = null;
+          this.log.logger().info(`${info.path.typename} => ${info.path.key}() | Success Message ::: ${data.message}`);
         } else {
-          this.log.logger().error(`${info.path.typename} => ${info.path.key}() | Error Message ::: ${data.error}`);
-        }
+          const { message, stack, name } = data.error;
 
+          this.log
+            .logger()
+            .error(
+              `${info.path.typename} => ${info.path.key}() | Error Message ::: ${message} | Error Name ::: ${name} | Error Stack ::: ${stack}`,
+            );
+
+          data.error = message;
+        }
         return data;
       }),
     );
