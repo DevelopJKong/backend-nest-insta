@@ -1,9 +1,8 @@
-import { Hashtag as HashtagType } from '../../hashtags/entities/hashtag.entity';
+import { Hashtag } from './hashtag.entity';
 import { User } from './../../users/entities/user.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { CoreEntity } from './../../common/entites/core.entity';
 import { IsOptional } from 'class-validator';
-import { Hashtag } from '@prisma/client';
 
 @InputType('PhotoInputType', { isAbstract: true })
 @ObjectType()
@@ -19,7 +18,7 @@ export class Photo extends CoreEntity {
   @IsOptional()
   user?: User;
 
-  @Field(_type => [HashtagType], { nullable: true })
+  @Field(_type => [Hashtag], { nullable: true })
   @IsOptional()
   hashtags?: Hashtag[];
 }

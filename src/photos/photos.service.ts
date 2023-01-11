@@ -4,7 +4,8 @@ import { SeePhotoOutput, SeePhotoInput } from './dtos/see-photo.dto';
 import { PrismaService } from './../prisma/prisma.service';
 import { UploadPhotoInput, UploadPhotoOutput } from './dtos/upload-photo.dto';
 import { Injectable } from '@nestjs/common';
-import { Hashtag } from 'src/hashtags/entities/hashtag.entity';
+import { Hashtag } from 'src/photos/entities/hashtag.entity';
+import { SeeHashTagInput, SeeHashTagOutput } from './dtos/see-hashtags.dto';
 
 @Injectable()
 export class PhotosService {
@@ -13,11 +14,13 @@ export class PhotosService {
   async user(id: number): Promise<User> {
     // ! 포토 유저 호출 성공
     this.log.logger().info(`${this.log.loggerInfo('포토 유저 호출 성공')}`);
-    return this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         id,
       },
     });
+
+    return user as User;
   }
 
   async hashtags(id: number): Promise<Hashtag[]> {
@@ -32,7 +35,22 @@ export class PhotosService {
         },
       },
     });
-    return hashtags;
+    return hashtags as Hashtag[];
+  }
+
+  async totalPhotos(id: number): Promise<number> {
+    // ! 포토 총 사진 호출 성공
+    this.log.logger().info(`${this.log.loggerInfo('포토 총 사진 호출 성공')}`);
+    const totalPhotos = await this.prisma.photo.count({
+      where: {
+        hashtags: {
+          some: {
+            id,
+          },
+        },
+      },
+    });
+    return totalPhotos;
   }
 
   async uploadPhoto(userId: number, { photoFile, caption }: UploadPhotoInput): Promise<UploadPhotoOutput> {
@@ -84,13 +102,9 @@ export class PhotosService {
 
       return {
         photo: {
-          id: photo.id,
-          file: photo.file,
-          caption: photo.caption,
+          ...photo,
           hashtags: await this.hashtags(photo.id),
           user: await this.user(photo.userId),
-          createdAt: photo.createdAt,
-          updatedAt: photo.updatedAt,
         },
         ok: true,
         message: '사진 보기 성공',
@@ -99,6 +113,30 @@ export class PhotosService {
       return {
         ok: false,
         error: new Error(error),
+      };
+    }
+  }
+
+  async seeHashTag({ hashtag }: SeeHashTagInput): Promise<SeeHashTagOutput> {
+    try {
+      const tag = await this.prisma.hashtag.findUnique({
+        where: {
+          hashtag,
+        },
+      });
+      return {
+        ok: true,
+        hashtag: {
+          ...tag,
+          totalPhotos: await this.totalPhotos(tag.id),
+        },
+        message: '해시태크 보기 성공',
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: new Error(error),
+        message: 'extraError',
       };
     }
   }
