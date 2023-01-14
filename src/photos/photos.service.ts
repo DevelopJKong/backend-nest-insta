@@ -1,3 +1,4 @@
+import { ResolveFieldTotalPhotosOutput } from './dtos/resolve-field-total-photos.dto';
 import { LoggerService } from './../libs/logger/logger.service';
 import { User } from './../users/entities/user.entity';
 import { SeePhotoOutput, SeePhotoInput } from './dtos/see-photo.dto';
@@ -7,26 +8,31 @@ import { Injectable } from '@nestjs/common';
 import { Hashtag } from 'src/photos/entities/hashtag.entity';
 import { SeeHashtagInput, SeeHashtagOutput } from './dtos/see-hashtags.dto';
 import { Photo } from './entities/photo.entity';
+import { ResolveFieldHashtagsOutput } from './dtos/resolve-field-hashtags.dto';
+import { ResolveFieldPhotosOutput } from './dtos/resolve-field-photos.dto';
+import { ResolveFieldUserOutput } from './dtos/resolve-field-user.dto';
 
 @Injectable()
 export class PhotosService {
   constructor(private readonly prisma: PrismaService, private readonly log: LoggerService) {}
 
-  async user(id: number): Promise<User> {
+  async user(id: number): Promise<ResolveFieldUserOutput> {
     // ! 포토 유저 호출 성공
-    this.log.logger().info(`${this.log.loggerInfo('포토 유저 호출 성공')}`);
     const user = await this.prisma.user.findUnique({
       where: {
         id,
       },
     });
 
-    return user as User;
+    return {
+      ok: true,
+      message: '포토 유저 호출 성공',
+      user: user as User,
+    };
   }
 
-  async hashtags(id: number): Promise<Hashtag[]> {
+  async hashtags(id: number): Promise<ResolveFieldHashtagsOutput> {
     // ! 포토 해시태그 호출 성공
-    this.log.logger().info(`${this.log.loggerInfo('포토 해시태그 호출 성공')}`);
     const hashtags = await this.prisma.hashtag.findMany({
       where: {
         photos: {
@@ -36,17 +42,21 @@ export class PhotosService {
         },
       },
     });
-    return hashtags as Hashtag[];
+    return {
+      ok: true,
+      message: '포토 해시태그 호출 성공',
+      hashtags: hashtags as Hashtag[],
+    };
   }
 
-  async photos(id: number, page: number, userId: number): Promise<Photo[]> {
+  async photos(id: number, page: number, userId: number): Promise<ResolveFieldPhotosOutput> {
     if (!userId) {
-      // ! 포토 호출 실패
-      this.log.logger().info(`${this.log.loggerInfo('포토 호출 실패')}`);
-      return null;
+      return {
+        ok: false,
+        message: '로그인이 필요합니다.',
+        error: new Error('unAuthorized'),
+      };
     }
-    // ! 포토 호출 성공
-    this.log.logger().info(`${this.log.loggerInfo('포토 호출 성공')}`);
     const photos = await this.prisma.hashtag
       .findUnique({
         where: {
@@ -57,12 +67,15 @@ export class PhotosService {
         take: 5,
         skip: (page - 1) * 5,
       });
-    return photos as Photo[];
+    return {
+      ok: true,
+      message: '포토 호출 성공',
+      photos: photos as Photo[],
+    };
   }
 
-  async totalPhotos(id: number): Promise<number> {
+  async totalPhotos(id: number): Promise<ResolveFieldTotalPhotosOutput> {
     // ! 포토 총 사진 호출 성공
-    this.log.logger().info(`${this.log.loggerInfo('포토 총 사진 호출 성공')}`);
     const totalPhotos = await this.prisma.photo.count({
       where: {
         hashtags: {
@@ -72,7 +85,11 @@ export class PhotosService {
         },
       },
     });
-    return totalPhotos;
+    return {
+      ok: true,
+      message: '포토 총 사진 호출 성공',
+      totalPhotos,
+    };
   }
 
   async uploadPhoto(userId: number, { photoFile, caption }: UploadPhotoInput): Promise<UploadPhotoOutput> {
@@ -126,8 +143,8 @@ export class PhotosService {
       return {
         photo: {
           ...photo,
-          hashtags: await this.hashtags(photo.id),
-          user: await this.user(photo.userId),
+          hashtags: await this.hashtags(photo.id).then(res => res.hashtags),
+          user: await this.user(photo.userId).then(res => res.user),
         },
         ok: true,
         message: '사진 보기 성공',
@@ -158,8 +175,8 @@ export class PhotosService {
       }
       return {
         ok: true,
-        photos: await this.photos(tag.id, page, userId),
-        totalPhotos: await this.totalPhotos(tag.id),
+        photos: await this.photos(tag.id, page, userId).then(res => res.photos),
+        totalPhotos: await this.totalPhotos(tag.id).then(res => res.totalPhotos),
         message: '해시태크 보기 성공',
       };
     } catch (error) {
