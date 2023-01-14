@@ -5,7 +5,8 @@ import { PrismaService } from './../prisma/prisma.service';
 import { UploadPhotoInput, UploadPhotoOutput } from './dtos/upload-photo.dto';
 import { Injectable } from '@nestjs/common';
 import { Hashtag } from 'src/photos/entities/hashtag.entity';
-import { SeeHashTagInput, SeeHashTagOutput } from './dtos/see-hashtags.dto';
+import { SeeHashtagInput, SeeHashtagOutput } from './dtos/see-hashtags.dto';
+import { Photo } from './entities/photo.entity';
 
 @Injectable()
 export class PhotosService {
@@ -36,6 +37,27 @@ export class PhotosService {
       },
     });
     return hashtags as Hashtag[];
+  }
+
+  async photos(id: number, page: number, userId: number): Promise<Photo[]> {
+    if (!userId) {
+      // ! 포토 호출 실패
+      this.log.logger().info(`${this.log.loggerInfo('포토 호출 실패')}`);
+      return null;
+    }
+    // ! 포토 호출 성공
+    this.log.logger().info(`${this.log.loggerInfo('포토 호출 성공')}`);
+    const photos = await this.prisma.hashtag
+      .findUnique({
+        where: {
+          id,
+        },
+      })
+      .photos({
+        take: 5,
+        skip: (page - 1) * 5,
+      });
+    return photos as Photo[];
   }
 
   async totalPhotos(id: number): Promise<number> {
@@ -88,6 +110,7 @@ export class PhotosService {
       return {
         ok: false,
         error: new Error(error),
+        message: 'extraError',
       };
     }
   }
@@ -113,23 +136,30 @@ export class PhotosService {
       return {
         ok: false,
         error: new Error(error),
+        message: 'extraError',
       };
     }
   }
 
-  async seeHashTag({ hashtag }: SeeHashTagInput): Promise<SeeHashTagOutput> {
+  async seeHashtag({ hashtag, page }: SeeHashtagInput, userId: number): Promise<SeeHashtagOutput> {
     try {
       const tag = await this.prisma.hashtag.findUnique({
         where: {
           hashtag,
         },
       });
+      if (!tag) {
+        return {
+          ok: false,
+          error: new Error('해시태그 없음'),
+          message: '해시태그 없음',
+          photos: null,
+        };
+      }
       return {
         ok: true,
-        hashtag: {
-          ...tag,
-          totalPhotos: await this.totalPhotos(tag.id),
-        },
+        photos: await this.photos(tag.id, page, userId),
+        totalPhotos: await this.totalPhotos(tag.id),
         message: '해시태크 보기 성공',
       };
     } catch (error) {
@@ -137,6 +167,7 @@ export class PhotosService {
         ok: false,
         error: new Error(error),
         message: 'extraError',
+        photos: null,
       };
     }
   }

@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { PhotosService } from './photos.service';
-import { PhotosResolver } from './photos.resolver';
+import { HashtagResolver, PhotosResolver } from './photos.resolver';
 
 @Module({
-  providers: [PhotosService, PhotosResolver],
+  providers: [PhotosService, PhotosResolver, HashtagResolver],
 })
 export class PhotosModule {}

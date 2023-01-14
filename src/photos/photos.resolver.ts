@@ -8,7 +8,7 @@ import { PhotosService } from './photos.service';
 import { Role } from 'src/libs/auth/role.decorator';
 import { Photo } from './entities/photo.entity';
 import { Hashtag } from 'src/photos/entities/hashtag.entity';
-import { SeeHashTagInput, SeeHashTagOutput } from './dtos/see-hashtags.dto';
+import { SeeHashtagInput, SeeHashtagOutput } from './dtos/see-hashtags.dto';
 
 @Resolver(_of => Photo)
 export class PhotosResolver {
@@ -29,12 +29,6 @@ export class PhotosResolver {
     return this.photosService.seePhoto(seePhotoInput);
   }
 
-  @Query(_return => SeeHashTagOutput)
-  @Role([RoleData.USER])
-  async seeHashTag(@Args('input') seeHashTagInput: SeeHashTagInput): Promise<SeeHashTagOutput> {
-    return this.photosService.seeHashTag(seeHashTagInput);
-  }
-
   @ResolveField(_type => User)
   async user(@Parent() photo: Photo): Promise<User> {
     return this.photosService.user(photo.user.id);
@@ -43,8 +37,31 @@ export class PhotosResolver {
   async hashtags(@Parent() photo: Photo): Promise<Hashtag[]> {
     return this.photosService.hashtags(photo.id);
   }
+}
+
+@Resolver(_of => Hashtag)
+export class HashtagResolver {
+  constructor(private readonly photosService: PhotosService) {}
+
+  @Query(_return => SeeHashtagOutput, { name: 'seeHashtag' })
+  @Role([RoleData.USER])
+  async seeHashTag(
+    @Args('input') seeHashTagInput: SeeHashtagInput,
+    @AuthUser() authUser: User,
+  ): Promise<SeeHashtagOutput> {
+    return this.photosService.seeHashtag(seeHashTagInput, authUser.id);
+  }
+
+  @ResolveField(_type => [Photo])
+  async photos(
+    @Parent() hashtag: Hashtag,
+    @Args('page', { type: () => Number }) page: number,
+    @AuthUser() authUser: User,
+  ): Promise<Photo[]> {
+    return this.photosService.photos(hashtag.id, page, authUser.id);
+  }
   @ResolveField(_type => Number)
-  async totalPhotos(@Parent() photo: Photo): Promise<number> {
-    return this.photosService.totalPhotos(photo.id);
+  async totalPhotos(@Parent() hashtag: Hashtag): Promise<number> {
+    return this.photosService.totalPhotos(hashtag.id);
   }
 }
