@@ -1,3 +1,4 @@
+import { Photo } from './../photos/entities/photo.entity';
 import { SeeFollowingOutput, SeeFollowingInput } from './dtos/see-following.dto';
 import { SeeFollowersInput, SeeFollowersOutput } from './dtos/see-followers.dto';
 import { FollowUserInput, FollowUserOutput } from './dtos/follow-user.dto';
@@ -18,6 +19,7 @@ import { fileFolder } from 'src/common/common.constants';
 import { UnFollowUserInput, UnFollowUserOutput } from './dtos/un-follow-user.dto';
 import { User } from './entities/user.entity';
 import { SearchUsersInput, SearchUsersOutput } from './dtos/search-users.dto';
+import { ResolveFieldUserPhotosOutput } from './dtos/resolve-field-user-photos.dto';
 
 @Injectable()
 export class UsersService {
@@ -131,6 +133,20 @@ export class UsersService {
         error: new Error(error),
       };
     }
+  }
+
+  async photos(id: number): Promise<ResolveFieldUserPhotosOutput> {
+    const photos = await this.prisma.user
+      .findUnique({
+        where: {
+          id,
+        },
+      })
+      .photos();
+    return {
+      ok: true,
+      photos: photos as Photo[],
+    };
   }
 
   async createUser({ firstName, lastName, email, username, password }: CreateUserInput): Promise<CreateUserOutput> {

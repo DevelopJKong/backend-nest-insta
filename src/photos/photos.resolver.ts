@@ -1,3 +1,4 @@
+import { SearchPhotosInput, SearchPhotosOutput } from './dtos/saerch-photos.dto';
 import { SeePhotoOutput, SeePhotoInput } from './dtos/see-photo.dto';
 import { RoleData } from '@prisma/client';
 import { User } from './../users/entities/user.entity';
@@ -13,6 +14,7 @@ import { ResolveFieldTotalPhotosOutput } from './dtos/resolve-field-total-photos
 import { ResolveFieldPhotosOutput } from './dtos/resolve-field-photos.dto';
 import { ResolveFieldUserOutput } from './dtos/resolve-field-user.dto';
 import { ResolveFieldHashtagsOutput } from './dtos/resolve-field-hashtags.dto';
+import { EditPhotoOutput, EditPhotoInput } from './dtos/edit-photo.dto';
 
 @Resolver(_of => Photo)
 export class PhotosResolver {
@@ -31,6 +33,18 @@ export class PhotosResolver {
   @Role([RoleData.USER])
   async seePhoto(@Args('input') seePhotoInput: SeePhotoInput): Promise<SeePhotoOutput> {
     return this.photosService.seePhoto(seePhotoInput);
+  }
+
+  @Query(_return => SearchPhotosOutput)
+  @Role([RoleData.USER])
+  async searchPhotos(@Args('input') searchPhotosInput: SearchPhotosInput): Promise<SearchPhotosOutput> {
+    return this.photosService.searchPhotos(searchPhotosInput);
+  }
+
+  @Mutation(_return => Boolean)
+  @Role([RoleData.USER])
+  async editPhoto(@AuthUser() authUser: User, @Args('input') editPhotoInput: EditPhotoInput): Promise<EditPhotoOutput> {
+    return this.photosService.editPhoto(editPhotoInput, authUser.id);
   }
 
   @ResolveField(_type => User)

@@ -1,3 +1,5 @@
+import { EditPhotoOutput, EditPhotoInput } from './dtos/edit-photo.dto';
+import { SearchPhotosInput, SearchPhotosOutput } from './dtos/saerch-photos.dto';
 import { ResolveFieldTotalPhotosOutput } from './dtos/resolve-field-total-photos.dto';
 import { LoggerService } from './../libs/logger/logger.service';
 import { User } from './../users/entities/user.entity';
@@ -186,6 +188,56 @@ export class PhotosService {
         message: 'extraError',
         photos: null,
       };
+    }
+  }
+
+  async searchPhotos({ keyword }: SearchPhotosInput): Promise<SearchPhotosOutput> {
+    try {
+      const photos = await this.prisma.photo.findMany({
+        where: { caption: { contains: keyword } },
+      });
+
+      return {
+        ok: true,
+        photos: photos as Photo[],
+        message: '사진 검색 성공',
+      };
+    } catch (error) {
+      return { ok: false, error: new Error(error), message: 'extraError', photos: null };
+    }
+  }
+
+  async editPhoto({ id, caption }: EditPhotoInput, userId: number): Promise<EditPhotoOutput> {
+    try {
+      const ok = await this.prisma.photo.findFirst({
+        where: {
+          id,
+          userId,
+        },
+      });
+
+      if (!ok) {
+        return {
+          ok: false,
+          error: new Error('unAuthorized'),
+          message: '포토를 수정할 권한이 없습니다.',
+        };
+      }
+
+      await this.prisma.photo.update({
+        where: {
+          id,
+        },
+        data: {
+          caption,
+        },
+      });
+      return {
+        ok: true,
+        message: '사진 수정 성공',
+      };
+    } catch (error) {
+      return { ok: false, error: new Error(error), message: 'extraError' };
     }
   }
 }
