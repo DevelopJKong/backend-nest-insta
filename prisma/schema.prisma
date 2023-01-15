@@ -20,12 +20,13 @@ model User {
   bio       String?
   avatar    String?
   role      RoleData @default(USER)
+  photos    Photo[]
+  likes     Like[]
   followers User[]   @relation("FollowRelation")
   following User[]   @relation("FollowRelation")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   userId    Int?
-  photos    Photo[]
 }
 
 enum RoleData {
@@ -42,6 +43,7 @@ model Photo {
   hashtags  Hashtag[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  Like      Like[]
 }
 
 model Hashtag {
@@ -50,4 +52,16 @@ model Hashtag {
   photos    Photo[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  photoId   Int
+  userId    Int
+  photo     Photo    @relation(fields: [photoId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([photoId, userId])
 }

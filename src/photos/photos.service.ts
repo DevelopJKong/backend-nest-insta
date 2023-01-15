@@ -14,6 +14,7 @@ import { Photo } from './entities/photo.entity';
 import { ResolveFieldHashtagsOutput } from './dtos/resolve-field-hashtags.dto';
 import { ResolveFieldPhotosOutput } from './dtos/resolve-field-photos.dto';
 import { ResolveFieldUserOutput } from './dtos/resolve-field-user.dto';
+import { ToggleLikeInput as ToggleLikeInput, ToggleLikeOutput as ToggleLikeOutput } from './dtos/toggle-like.dto';
 
 @Injectable()
 export class PhotosService {
@@ -244,6 +245,30 @@ export class PhotosService {
       return {
         ok: true,
         message: '사진 수정 성공',
+      };
+    } catch (error) {
+      return { ok: false, error: new Error(error), message: 'extraError' };
+    }
+  }
+
+  async toggleLike({ id }: ToggleLikeInput, userId: number): Promise<ToggleLikeOutput> {
+    try {
+      const ok = await this.prisma.photo.findUnique({
+        where: {
+          id,
+        },
+      });
+
+      if (!ok) {
+        return {
+          ok: false,
+          error: new Error('notFound'),
+          message: '포토가 없습니다.',
+        };
+      }
+
+      return {
+        ok: true,
       };
     } catch (error) {
       return { ok: false, error: new Error(error), message: 'extraError' };

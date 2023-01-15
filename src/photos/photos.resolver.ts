@@ -1,3 +1,4 @@
+import { ToggleLikeOutput, ToggleLikeInput } from './dtos/toggle-like.dto';
 import { SeePhotoOutput, SeePhotoInput } from './dtos/see-photo.dto';
 import { RoleData } from '@prisma/client';
 import { User } from './../users/entities/user.entity';
@@ -45,6 +46,15 @@ export class PhotosResolver {
   @Role([RoleData.USER])
   async editPhoto(@AuthUser() authUser: User, @Args('input') editPhotoInput: EditPhotoInput): Promise<EditPhotoOutput> {
     return this.photosService.editPhoto(editPhotoInput, authUser.id);
+  }
+
+  @Mutation(_return => ToggleLikeOutput)
+  @Role([RoleData.USER])
+  async likePhoto(
+    @AuthUser() authUser: User,
+    @Args('input') likePhotoInput: ToggleLikeInput,
+  ): Promise<ToggleLikeOutput> {
+    return this.photosService.toggleLike(likePhotoInput, authUser.id);
   }
 
   @ResolveField(_type => User)
