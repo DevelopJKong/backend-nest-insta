@@ -1,3 +1,4 @@
+import { SeeLikesOutput } from './dtos/see-likes.dto';
 import { ToggleLikeInput, ToggleLikeOutput } from './dtos/toggle-like.dto';
 import { EditPhotoInput, EditPhotoOutput } from './dtos/edit-photo.dto';
 import { SearchPhotosOutput, SearchPhotosInput } from './dtos/search-photos.dto';
@@ -287,6 +288,25 @@ export class PhotosService {
 
       return {
         ok: true,
+      };
+    } catch (error) {
+      return { ok: false, error: new Error(error), message: 'extraError' };
+    }
+  }
+
+  async seeLikes(id: number): Promise<SeeLikesOutput> {
+    try {
+      const likes = await this.prisma.like.findMany({
+        where: {
+          photoId: id,
+        },
+        select: {
+          user: true,
+        },
+      });
+      return {
+        ok: true,
+        user: likes.map(like => like.user),
       };
     } catch (error) {
       return { ok: false, error: new Error(error), message: 'extraError' };
