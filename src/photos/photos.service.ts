@@ -12,6 +12,7 @@ import { Injectable } from '@nestjs/common';
 import { Hashtag } from 'src/photos/entities/hashtag.entity';
 import { SeeHashtagInput, SeeHashtagOutput } from './dtos/see-hashtags.dto';
 import { Photo } from './entities/photo.entity';
+import { SeeFeedOutput } from './dtos/see-feed.dto';
 
 @Injectable()
 export class PhotosService {
@@ -307,6 +308,39 @@ export class PhotosService {
       return {
         ok: true,
         user: likes.map(like => like.user),
+      };
+    } catch (error) {
+      return { ok: false, error: new Error(error), message: 'extraError' };
+    }
+  }
+
+  async seeFeed(userId: number): Promise<SeeFeedOutput> {
+    const firstCondition = {
+      user: {
+        followers: {
+          some: {
+            id: userId,
+          },
+        },
+      },
+    };
+
+    const secondCondition = {
+      userId,
+    };
+
+    try {
+      const photos = await this.prisma.photo.findMany({
+        where: {
+          OR: [firstCondition, secondCondition],
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
+      return {
+        ok: true,
+        photos,
       };
     } catch (error) {
       return { ok: false, error: new Error(error), message: 'extraError' };

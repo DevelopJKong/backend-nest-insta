@@ -1,3 +1,4 @@
+import { SeeFeedOutput } from './dtos/see-feed.dto';
 import { SeeLikesOutput, SeeLikesInput } from './dtos/see-likes.dto';
 import { SearchPhotosInput, SearchPhotosOutput } from './dtos/search-photos.dto';
 import { ToggleLikeOutput, ToggleLikeInput } from './dtos/toggle-like.dto';
@@ -42,6 +43,12 @@ export class PhotosResolver {
   @Role([RoleData.USER])
   async seeLikes(@Args('input') { id }: SeeLikesInput): Promise<SeeLikesOutput> {
     return this.photosService.seeLikes(id);
+  }
+
+  @Query(_return => SeeFeedOutput)
+  @Role([RoleData.USER])
+  async seeFeed(@AuthUser() authUser: User): Promise<SeeFeedOutput> {
+    return this.photosService.seeFeed(authUser.id);
   }
 
   @Mutation(_return => ToggleLikeOutput)
