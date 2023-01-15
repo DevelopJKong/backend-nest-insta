@@ -1,3 +1,4 @@
+import { processHashtags } from './../libs/utils/process-hashtag';
 import { EditPhotoOutput, EditPhotoInput } from './dtos/edit-photo.dto';
 import { SearchPhotosInput, SearchPhotosOutput } from './dtos/saerch-photos.dto';
 import { ResolveFieldTotalPhotosOutput } from './dtos/resolve-field-total-photos.dto';
@@ -99,8 +100,7 @@ export class PhotosService {
       let hashtagObj = [];
 
       if (caption) {
-        const hashtags = caption.match(/#[\w]+/g);
-        hashtagObj = hashtags.map(hashtag => ({ where: { hashtag }, create: { hashtag } }));
+        hashtagObj = processHashtags(caption);
       }
 
       const { filename } = await photoFile;
@@ -172,7 +172,6 @@ export class PhotosService {
           ok: false,
           error: new Error('해시태그 없음'),
           message: '해시태그 없음',
-          photos: null,
         };
       }
       return {
@@ -186,7 +185,6 @@ export class PhotosService {
         ok: false,
         error: new Error(error),
         message: 'extraError',
-        photos: null,
       };
     }
   }
@@ -209,14 +207,21 @@ export class PhotosService {
 
   async editPhoto({ id, caption }: EditPhotoInput, userId: number): Promise<EditPhotoOutput> {
     try {
-      const ok = await this.prisma.photo.findFirst({
+      const oldPhotos = await this.prisma.photo.findFirst({
         where: {
           id,
           userId,
         },
+        include: {
+          hashtags: {
+            select: {
+              hashtag: true,
+            },
+          },
+        },
       });
 
-      if (!ok) {
+      if (!oldPhotos) {
         return {
           ok: false,
           error: new Error('unAuthorized'),
@@ -230,6 +235,10 @@ export class PhotosService {
         },
         data: {
           caption,
+          hashtags: {
+            disconnect: oldPhotos.hashtags,
+            connectOrCreate: processHashtags(caption),
+          },
         },
       });
       return {
