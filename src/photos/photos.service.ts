@@ -1,6 +1,6 @@
 import { processHashtags } from './../libs/utils/process-hashtag';
 import { EditPhotoOutput, EditPhotoInput } from './dtos/edit-photo.dto';
-import { SearchPhotosInput, SearchPhotosOutput } from './dtos/saerch-photos.dto';
+import { SearchPhotosInput, SearchPhotosOutput } from './dtos/search-photos.dto';
 import { ResolveFieldTotalPhotosOutput } from './dtos/resolve-field-total-photos.dto';
 import { LoggerService } from './../libs/logger/logger.service';
 import { User } from './../users/entities/user.entity';

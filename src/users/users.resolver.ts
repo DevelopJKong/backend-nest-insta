@@ -5,7 +5,7 @@ import { SeeFollowersOutput, SeeFollowersInput } from './dtos/see-followers.dto'
 import { FollowUserInput, FollowUserOutput } from './dtos/follow-user.dto';
 import { RoleData } from '@prisma/client';
 import { GetUserInput, GetUserOutput } from './dtos/get-user.dto';
-import { Resolver, Args, Query, Mutation, ResolveField, Int, Parent } from '@nestjs/graphql';
+import { Resolver, Args, Query, Mutation, ResolveField, Parent } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { CreateUserInput, CreateUserOutput } from './dtos/create-user.dto';
@@ -15,6 +15,10 @@ import { Role } from '../libs/auth/role.decorator';
 import { AuthUser } from 'src/libs/auth/auth-user.decorator';
 import { UnFollowUserInput, UnFollowUserOutput } from './dtos/un-follow-user.dto';
 import { SeeFollowingOutput, SeeFollowingInput } from './dtos/see-following.dto';
+import { ResolveFieldUserTotalFollowingOutput } from './dtos/resolve-field-total-following.dto';
+import { ResolveFieldTotalFollowersOutput } from './dtos/resolve-field-total-followers.dto';
+import { ResolveFieldIsMeOutput } from './dtos/resolve-field-is-me.dto';
+import { ResolveFieldIsFollowingOutput } from './dtos/resolve-field-is-following.dto';
 @Resolver((_of?: void) => User)
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
@@ -77,22 +81,22 @@ export class UsersResolver {
     return this.usersService.searchUsers(authUser.id, searchUserInput);
   }
 
-  @ResolveField(_type => Int)
-  totalFollowing(@Parent() user: User): Promise<number> {
+  @ResolveField(_type => ResolveFieldUserTotalFollowingOutput)
+  totalFollowing(@Parent() user: User): Promise<ResolveFieldUserTotalFollowingOutput> {
     return this.usersService.totalFollowing(user.id);
   }
 
-  @ResolveField(_type => Int)
-  totalFollowers(@Parent() user: User): Promise<number> {
+  @ResolveField(_type => ResolveFieldTotalFollowersOutput)
+  totalFollowers(@Parent() user: User): Promise<ResolveFieldTotalFollowersOutput> {
     return this.usersService.totalFollowers(user.id);
   }
-  @ResolveField(_type => Boolean)
-  isMe(@AuthUser() authUser: User, @Parent() user: User): boolean {
+  @ResolveField(_type => ResolveFieldIsMeOutput)
+  isMe(@AuthUser() authUser: User, @Parent() user: User): ResolveFieldIsMeOutput {
     return this.usersService.isMe(authUser, user.id);
   }
 
-  @ResolveField(_type => Boolean)
-  isFollowing(@AuthUser() authUser: User, @Parent() user: User): Promise<boolean> | boolean {
+  @ResolveField(_type => ResolveFieldIsFollowingOutput)
+  isFollowing(@AuthUser() authUser: User, @Parent() user: User): Promise<ResolveFieldIsFollowingOutput> {
     return this.usersService.isFollowing(authUser, user.id);
   }
 

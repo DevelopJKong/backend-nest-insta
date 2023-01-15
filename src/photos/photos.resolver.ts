@@ -1,4 +1,3 @@
-import { SearchPhotosInput, SearchPhotosOutput } from './dtos/saerch-photos.dto';
 import { SeePhotoOutput, SeePhotoInput } from './dtos/see-photo.dto';
 import { RoleData } from '@prisma/client';
 import { User } from './../users/entities/user.entity';
@@ -15,6 +14,7 @@ import { ResolveFieldPhotosOutput } from './dtos/resolve-field-photos.dto';
 import { ResolveFieldUserOutput } from './dtos/resolve-field-user.dto';
 import { ResolveFieldHashtagsOutput } from './dtos/resolve-field-hashtags.dto';
 import { EditPhotoOutput, EditPhotoInput } from './dtos/edit-photo.dto';
+import { SearchPhotosInput, SearchPhotosOutput } from './dtos/search-photos.dto';
 
 @Resolver(_of => Photo)
 export class PhotosResolver {

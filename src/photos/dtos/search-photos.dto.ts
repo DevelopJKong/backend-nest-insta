@@ -1,4 +1,4 @@
-import { Photo } from './../entities/photo.entity';
+import { Photo } from '../entities/photo.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { IsOptional } from 'class-validator';
 import { CoreOutput } from 'src/common/dtos/output.dto';

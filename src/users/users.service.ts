@@ -1,3 +1,4 @@
+import { ResolveFieldIsFollowingOutput } from './dtos/resolve-field-is-following.dto';
 import { Photo } from './../photos/entities/photo.entity';
 import { SeeFollowingOutput, SeeFollowingInput } from './dtos/see-following.dto';
 import { SeeFollowersInput, SeeFollowersOutput } from './dtos/see-followers.dto';
@@ -20,6 +21,9 @@ import { UnFollowUserInput, UnFollowUserOutput } from './dtos/un-follow-user.dto
 import { User } from './entities/user.entity';
 import { SearchUsersInput, SearchUsersOutput } from './dtos/search-users.dto';
 import { ResolveFieldUserPhotosOutput } from './dtos/resolve-field-user-photos.dto';
+import { ResolveFieldUserTotalFollowingOutput } from './dtos/resolve-field-total-following.dto';
+import { ResolveFieldTotalFollowersOutput } from './dtos/resolve-field-total-followers.dto';
+import { ResolveFieldIsMeOutput } from './dtos/resolve-field-is-me.dto';
 
 @Injectable()
 export class UsersService {
@@ -29,10 +33,9 @@ export class UsersService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async totalFollowing(id: number): Promise<number> {
+  async totalFollowing(id: number): Promise<ResolveFieldUserTotalFollowingOutput> {
     // ! 팔로잉 수
-    this.log.logger().info(`${this.log.loggerInfo('팔로잉 수')}`);
-    return this.prisma.user
+    const totalFollowing = await this.prisma.user
       .count({
         where: {
           followers: {
@@ -42,14 +45,18 @@ export class UsersService {
           },
         },
       })
-      .then(res => res)
       .catch(error => error && 0);
+
+    return {
+      ok: true,
+      count: totalFollowing,
+    };
   }
 
-  async totalFollowers(id: number): Promise<number> {
+  async totalFollowers(id: number): Promise<ResolveFieldTotalFollowersOutput> {
     // ! 팔로워 수
     this.log.logger().info(`${this.log.loggerInfo('팔로워 수')}`);
-    return this.prisma.user
+    const totalFollowers = await this.prisma.user
       .count({
         where: {
           following: {
@@ -59,26 +66,38 @@ export class UsersService {
           },
         },
       })
-      .then(res => res)
       .catch(error => error && 0);
+    return {
+      ok: true,
+      count: totalFollowers,
+    };
   }
 
-  isMe(user: User, id: number): boolean {
+  isMe(user: User, id: number): ResolveFieldIsMeOutput {
     if (!user) {
-      return false;
+      return {
+        ok: false,
+        message: '접근할수있는 권한이 없습니다',
+        error: new Error('unAuthorized'),
+      };
     }
     // ! 내 계정인지 확인
-    this.log.logger().info(`${this.log.loggerInfo('내 계정인지 확인')}`);
-    return id === user.id;
+    return {
+      ok: true,
+      isMe: user.id === id,
+    };
   }
 
-  isFollowing(user: User, id: number): Promise<boolean> | boolean {
+  async isFollowing(user: User, id: number): Promise<ResolveFieldIsFollowingOutput> {
     if (!user) {
-      return false;
+      return {
+        ok: false,
+        message: '접근할수있는 권한이 없습니다',
+        error: new Error('unAuthorized'),
+      };
     }
     // ! 팔로잉 여부 확인
-    this.log.logger().info(`${this.log.loggerInfo('팔로잉 여부 확인')}`);
-    return this.prisma.user
+    const isFollowing = await this.prisma.user
       .count({
         where: {
           username: user.username,
@@ -89,8 +108,11 @@ export class UsersService {
           },
         },
       })
-      .then(res => Boolean(res))
       .catch(error => error && false);
+    return {
+      ok: true,
+      isFollowing: Boolean(isFollowing),
+    };
   }
 
   async findById(userId: number, { id }: GetUserInput): Promise<GetUserOutput> {
@@ -107,8 +129,8 @@ export class UsersService {
       });
       const totalFollowing = await this.totalFollowing(id);
       const totalFollowers = await this.totalFollowers(id);
-      const isMe = this.isMe(user, userId);
-      const isFollowing = await this.isFollowing(user, userId);
+      const { isMe } = this.isMe(user, userId);
+      const { isFollowing } = await this.isFollowing(user, userId);
       // ! 유저가 없을 경우
       if (!user) {
         return {
@@ -121,8 +143,8 @@ export class UsersService {
         ok: true,
         user,
         message: '유저 찾기',
-        totalFollowing,
-        totalFollowers,
+        totalFollowing: totalFollowing.count,
+        totalFollowers: totalFollowers.count,
         isMe,
         isFollowing,
       };
@@ -479,14 +501,14 @@ export class UsersService {
 
       const totalFollowing = await this.totalFollowing(userId);
       const totalFollowers = await this.totalFollowers(userId);
-      const isMe = this.isMe(user, userId);
-      const isFollowing = await this.isFollowing(user, userId);
+      const { isMe } = this.isMe(user, userId);
+      const { isFollowing } = await this.isFollowing(user, userId);
 
       return {
         ok: true,
         users,
-        totalFollowing,
-        totalFollowers,
+        totalFollowing: totalFollowing.count,
+        totalFollowers: totalFollowers.count,
         isMe,
         isFollowing,
       };
