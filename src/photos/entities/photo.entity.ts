@@ -21,4 +21,8 @@ export class Photo extends CoreEntity {
   @Field(_type => [Hashtag], { nullable: true })
   @IsOptional()
   hashtags?: Hashtag[];
+
+  @Field(_type => Number, { nullable: true })
+  @IsOptional()
+  likes?: number;
 }

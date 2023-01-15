@@ -74,6 +74,16 @@ export class PhotosService {
     return totalPhotos;
   }
 
+  async likes(id: number): Promise<number> {
+    return this.prisma.like
+      .count({
+        where: {
+          photoId: id,
+        },
+      })
+      .catch(error => error && 0);
+  }
+
   async uploadPhoto(userId: number, { photoFile, caption }: UploadPhotoInput): Promise<UploadPhotoOutput> {
     try {
       let hashtagObj = [];
@@ -126,6 +136,7 @@ export class PhotosService {
           ...photo,
           hashtags: await this.hashtags(photo.id),
           user: await this.user(photo.userId),
+          likes: await this.likes(photo.id),
         },
         ok: true,
         message: '사진 보기 성공',
@@ -229,18 +240,49 @@ export class PhotosService {
   }
   async toggleLike({ id }: ToggleLikeInput, userId: number): Promise<ToggleLikeOutput> {
     try {
-      const ok = await this.prisma.photo.findUnique({
+      const photo = await this.prisma.photo.findUnique({
         where: {
           id,
         },
       });
 
-      if (!ok) {
+      if (!photo) {
         return {
           ok: false,
           error: new Error('notFound'),
           message: '포토가 없습니다.',
         };
+      }
+
+      const likeWhere = {
+        photoId_userId: {
+          userId: userId,
+          photoId: id,
+        },
+      };
+      const like = await this.prisma.like.findUnique({
+        where: likeWhere,
+      });
+
+      if (like) {
+        await this.prisma.like.delete({
+          where: likeWhere,
+        });
+      } else {
+        await this.prisma.like.create({
+          data: {
+            user: {
+              connect: {
+                id: userId,
+              },
+            },
+            photo: {
+              connect: {
+                id: photo.id,
+              },
+            },
+          },
+        });
       }
 
       return {
