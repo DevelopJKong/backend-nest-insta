@@ -1,3 +1,4 @@
+import { Photo } from './../photos/entities/photo.entity';
 import { SeeFollowingOutput, SeeFollowingInput } from './dtos/see-following.dto';
 import { SeeFollowersInput, SeeFollowersOutput } from './dtos/see-followers.dto';
 import { FollowUserInput, FollowUserOutput } from './dtos/follow-user.dto';
@@ -89,6 +90,16 @@ export class UsersService {
       })
       .then(res => Boolean(res))
       .catch(error => error && false);
+  }
+  async photos(id: number): Promise<Photo[]> {
+    const photos = await this.prisma.user
+      .findUnique({
+        where: {
+          id,
+        },
+      })
+      .photos();
+    return photos as Photo[];
   }
 
   async findById(userId: number, { id }: GetUserInput): Promise<GetUserOutput> {

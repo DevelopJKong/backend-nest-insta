@@ -1,3 +1,4 @@
+import { Photo } from './../photos/entities/photo.entity';
 import { SearchUsersInput, SearchUsersOutput } from './dtos/search-users.dto';
 import { SeeFollowersOutput, SeeFollowersInput } from './dtos/see-followers.dto';
 import { FollowUserInput, FollowUserOutput } from './dtos/follow-user.dto';
@@ -92,5 +93,10 @@ export class UsersResolver {
   @ResolveField(_type => Boolean)
   isFollowing(@AuthUser() authUser: User, @Parent() user: User): Promise<boolean> | boolean {
     return this.usersService.isFollowing(authUser, user.id);
+  }
+
+  @ResolveField(_type => [Photo])
+  async photos(@Parent() user: User): Promise<Photo[]> {
+    return this.usersService.photos(user.id);
   }
 }

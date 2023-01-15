@@ -1,3 +1,7 @@
+import { ToggleLikeInput, ToggleLikeOutput } from './dtos/toggle-like.dto';
+import { EditPhotoInput, EditPhotoOutput } from './dtos/edit-photo.dto';
+import { SearchPhotosOutput, SearchPhotosInput } from './dtos/search-photos.dto';
+import { processHashtags } from './../libs/utils/process-hashtag';
 import { LoggerService } from './../libs/logger/logger.service';
 import { User } from './../users/entities/user.entity';
 import { SeePhotoOutput, SeePhotoInput } from './dtos/see-photo.dto';
@@ -80,8 +84,7 @@ export class PhotosService {
       let hashtagObj = [];
 
       if (caption) {
-        const hashtags = caption.match(/#[\w]+/g);
-        hashtagObj = hashtags.map(hashtag => ({ where: { hashtag }, create: { hashtag } }));
+        hashtagObj = processHashtags(caption);
       }
 
       const { filename } = await photoFile;
@@ -153,7 +156,6 @@ export class PhotosService {
           ok: false,
           error: new Error('해시태그 없음'),
           message: '해시태그 없음',
-          photos: null,
         };
       }
       return {
@@ -167,8 +169,90 @@ export class PhotosService {
         ok: false,
         error: new Error(error),
         message: 'extraError',
-        photos: null,
       };
+    }
+  }
+  async searchPhotos({ keyword }: SearchPhotosInput): Promise<SearchPhotosOutput> {
+    try {
+      const photos = await this.prisma.photo.findMany({
+        where: { caption: { contains: keyword } },
+      });
+
+      return {
+        ok: true,
+        photos: photos as Photo[],
+        message: '사진 검색 성공',
+      };
+    } catch (error) {
+      return { ok: false, error: new Error(error), message: 'extraError', photos: null };
+    }
+  }
+
+  async editPhoto({ id, caption }: EditPhotoInput, userId: number): Promise<EditPhotoOutput> {
+    try {
+      const oldPhotos = await this.prisma.photo.findFirst({
+        where: {
+          id,
+          userId,
+        },
+        include: {
+          hashtags: {
+            select: {
+              hashtag: true,
+            },
+          },
+        },
+      });
+
+      if (!oldPhotos) {
+        return {
+          ok: false,
+          error: new Error('unAuthorized'),
+          message: '포토를 수정할 권한이 없습니다.',
+        };
+      }
+
+      await this.prisma.photo.update({
+        where: {
+          id,
+        },
+        data: {
+          caption,
+          hashtags: {
+            disconnect: oldPhotos.hashtags,
+            connectOrCreate: processHashtags(caption),
+          },
+        },
+      });
+      return {
+        ok: true,
+        message: '사진 수정 성공',
+      };
+    } catch (error) {
+      return { ok: false, error: new Error(error), message: 'extraError' };
+    }
+  }
+  async toggleLike({ id }: ToggleLikeInput, userId: number): Promise<ToggleLikeOutput> {
+    try {
+      const ok = await this.prisma.photo.findUnique({
+        where: {
+          id,
+        },
+      });
+
+      if (!ok) {
+        return {
+          ok: false,
+          error: new Error('notFound'),
+          message: '포토가 없습니다.',
+        };
+      }
+
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      return { ok: false, error: new Error(error), message: 'extraError' };
     }
   }
 }

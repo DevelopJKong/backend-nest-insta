@@ -1,3 +1,4 @@
+import { Photo } from './../../photos/entities/photo.entity';
 import { IsEmail, IsEnum, IsString } from 'class-validator';
 import { CoreEntity } from './../../common/entites/core.entity';
 import { InputType, ObjectType, Field, registerEnumType } from '@nestjs/graphql';
@@ -43,6 +44,9 @@ export class User extends CoreEntity {
 
   @Field(_type => [User], { nullable: true })
   followers?: User[];
+
+  @Field(_type => [Photo], { nullable: true })
+  photos?: Photo[];
 
   @Field(_type => Number, { nullable: true })
   totalFollowing?: number;
