@@ -1,3 +1,4 @@
+import { SearchPhotosInput, SearchPhotosOutput } from './dtos/search-photos.dto';
 import { ToggleLikeOutput, ToggleLikeInput } from './dtos/toggle-like.dto';
 import { SeePhotoOutput, SeePhotoInput } from './dtos/see-photo.dto';
 import { RoleData } from '@prisma/client';
@@ -28,6 +29,12 @@ export class PhotosResolver {
   @Role([RoleData.USER])
   async seePhoto(@Args('input') seePhotoInput: SeePhotoInput): Promise<SeePhotoOutput> {
     return this.photosService.seePhoto(seePhotoInput);
+  }
+
+  @Query(_return => SearchPhotosOutput)
+  @Role([RoleData.USER])
+  async searchPhotos(@Args('input') searchPhotosInput: SearchPhotosInput): Promise<SearchPhotosOutput> {
+    return this.photosService.searchPhotos(searchPhotosInput);
   }
 
   @Mutation(_return => ToggleLikeOutput)

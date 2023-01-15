@@ -18,7 +18,6 @@ export class PhotosService {
 
   async user(id: number): Promise<User> {
     // ! 포토 유저 호출 성공
-    this.log.logger().info(`${this.log.loggerInfo('포토 유저 호출 성공')}`);
     const user = await this.prisma.user.findUnique({
       where: {
         id,
@@ -30,7 +29,6 @@ export class PhotosService {
 
   async hashtags(id: number): Promise<Hashtag[]> {
     // ! 포토 해시태그 호출 성공
-    this.log.logger().info(`${this.log.loggerInfo('포토 해시태그 호출 성공')}`);
     const hashtags = await this.prisma.hashtag.findMany({
       where: {
         photos: {
@@ -46,11 +44,9 @@ export class PhotosService {
   async photos(id: number, page: number, userId: number): Promise<Photo[]> {
     if (!userId) {
       // ! 포토 호출 실패
-      this.log.logger().info(`${this.log.loggerInfo('포토 호출 실패')}`);
       return null;
     }
     // ! 포토 호출 성공
-    this.log.logger().info(`${this.log.loggerInfo('포토 호출 성공')}`);
     const photos = await this.prisma.hashtag
       .findUnique({
         where: {
@@ -66,7 +62,6 @@ export class PhotosService {
 
   async totalPhotos(id: number): Promise<number> {
     // ! 포토 총 사진 호출 성공
-    this.log.logger().info(`${this.log.loggerInfo('포토 총 사진 호출 성공')}`);
     const totalPhotos = await this.prisma.photo.count({
       where: {
         hashtags: {

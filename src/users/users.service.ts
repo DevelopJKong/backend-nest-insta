@@ -30,7 +30,6 @@ export class UsersService {
 
   async totalFollowing(id: number): Promise<number> {
     // ! 팔로잉 수
-    this.log.logger().info(`${this.log.loggerInfo('팔로잉 수')}`);
     return this.prisma.user
       .count({
         where: {
@@ -47,7 +46,6 @@ export class UsersService {
 
   async totalFollowers(id: number): Promise<number> {
     // ! 팔로워 수
-    this.log.logger().info(`${this.log.loggerInfo('팔로워 수')}`);
     return this.prisma.user
       .count({
         where: {
@@ -67,7 +65,6 @@ export class UsersService {
       return false;
     }
     // ! 내 계정인지 확인
-    this.log.logger().info(`${this.log.loggerInfo('내 계정인지 확인')}`);
     return id === user.id;
   }
 
@@ -76,7 +73,6 @@ export class UsersService {
       return false;
     }
     // ! 팔로잉 여부 확인
-    this.log.logger().info(`${this.log.loggerInfo('팔로잉 여부 확인')}`);
     return this.prisma.user
       .count({
         where: {
