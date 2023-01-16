@@ -65,7 +65,7 @@ export class LoggerService {
       ],
     });
 
-    if (this.options.nodeEnv !== 'production') {
+    if (this.options.nodeEnv !== 'prod') {
       logger.add(
         new winston.transports.Console({
           format: winston.format.combine(

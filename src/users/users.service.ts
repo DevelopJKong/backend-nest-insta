@@ -28,6 +28,12 @@ export class UsersService {
     private readonly jwtService: JwtService,
   ) {}
 
+  successLogger(method: string) {
+    return this.log
+      .logger()
+      .info(`${UsersService.name} => ${this[`${method}`].name}() | Success Message ::: 데이터 호출 성공`);
+  }
+
   async totalFollowing(id: number): Promise<number> {
     // ! 팔로잉 수
     return this.prisma.user
