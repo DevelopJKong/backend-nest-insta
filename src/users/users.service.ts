@@ -36,7 +36,7 @@ export class UsersService {
 
   async totalFollowing(id: number): Promise<number> {
     // ! 팔로잉 수
-    return this.prisma.user
+    const totalFollowing = await this.prisma.user
       .count({
         where: {
           followers: {
@@ -46,13 +46,14 @@ export class UsersService {
           },
         },
       })
-      .then(res => res)
       .catch(error => error && 0);
+    if (process.env.NODE_ENV === 'dev') this.successLogger(this.totalFollowing.name);
+    return totalFollowing;
   }
 
   async totalFollowers(id: number): Promise<number> {
     // ! 팔로워 수
-    return this.prisma.user
+    const totalFollowers = await this.prisma.user
       .count({
         where: {
           following: {
@@ -62,8 +63,9 @@ export class UsersService {
           },
         },
       })
-      .then(res => res)
       .catch(error => error && 0);
+    if (process.env.NODE_ENV === 'dev') this.successLogger(this.totalFollowing.name);
+    return totalFollowers;
   }
 
   isMe(user: User, id: number): boolean {
@@ -71,15 +73,16 @@ export class UsersService {
       return false;
     }
     // ! 내 계정인지 확인
+    if (process.env.NODE_ENV === 'dev') this.successLogger(this.isMe.name);
     return id === user.id;
   }
 
-  isFollowing(user: User, id: number): Promise<boolean> | boolean {
+  async isFollowing(user: User, id: number): Promise<boolean> {
     if (!user) {
       return false;
     }
     // ! 팔로잉 여부 확인
-    return this.prisma.user
+    const isFollowing = await this.prisma.user
       .count({
         where: {
           username: user.username,
@@ -90,8 +93,9 @@ export class UsersService {
           },
         },
       })
-      .then(res => Boolean(res))
       .catch(error => error && false);
+    if (process.env.NODE_ENV === 'dev') this.successLogger(this.isMe.name);
+    return Boolean(isFollowing);
   }
   async photos(id: number): Promise<Photo[]> {
     const photos = await this.prisma.user
@@ -101,6 +105,7 @@ export class UsersService {
         },
       })
       .photos();
+    if (process.env.NODE_ENV === 'dev') this.successLogger(this.photos.name);
     return photos as Photo[];
   }
 
@@ -139,10 +144,7 @@ export class UsersService {
       };
     } catch (error) {
       // ! extraError
-      return {
-        ok: false,
-        error: new Error(error),
-      };
+      return { ok: false, error: new Error(error), message: 'extraError' };
     }
   }
 
@@ -188,10 +190,7 @@ export class UsersService {
       };
     } catch (error) {
       // ! extraError
-      return {
-        ok: false,
-        error: new Error(error),
-      };
+      return { ok: false, error: new Error(error), message: 'extraError' };
     }
   }
 
@@ -233,10 +232,7 @@ export class UsersService {
     } catch (error) {
       // ! extraError
 
-      return {
-        ok: false,
-        error: new Error(error),
-      };
+      return { ok: false, error: new Error(error), message: 'extraError' };
     }
   }
 
@@ -302,10 +298,7 @@ export class UsersService {
       };
     } catch (error) {
       // ! extraError
-      return {
-        ok: false,
-        error: new Error(error),
-      };
+      return { ok: false, error: new Error(error), message: 'extraError' };
     }
   }
 
@@ -338,10 +331,7 @@ export class UsersService {
       };
     } catch (error) {
       // ! extraError
-      return {
-        ok: false,
-        error: new Error(error),
-      };
+      return { ok: false, error: new Error(error), message: 'extraError' };
     }
   }
 
@@ -370,16 +360,12 @@ export class UsersService {
       });
 
       // * 언팔로우 완료
-      this.log.logger().info(`${this.log.loggerInfo('언팔로우 완료')}`);
       return {
         ok: true,
       };
     } catch (error) {
       // ! extraError
-      return {
-        ok: false,
-        error: new Error(error),
-      };
+      return { ok: false, error: new Error(error), message: 'extraError' };
     }
   }
   async seeFollowers(userId: number, { username, page }: SeeFollowersInput): Promise<SeeFollowersOutput> {
@@ -412,10 +398,7 @@ export class UsersService {
       };
     } catch (error) {
       // ! extraError
-      return {
-        ok: false,
-        error: new Error(error),
-      };
+      return { ok: false, error: new Error(error), message: 'extraError' };
     }
   }
 
@@ -445,10 +428,7 @@ export class UsersService {
       };
     } catch (error) {
       // ! extraError
-      return {
-        ok: false,
-        error: new Error(error),
-      };
+      return { ok: false, error: new Error(error), message: 'extraError' };
     }
   }
 
@@ -487,6 +467,9 @@ export class UsersService {
         isMe,
         isFollowing,
       };
-    } catch (error) {}
+    } catch (error) {
+      // ! extraError
+      return { ok: false, error: new Error(error), message: 'extraError' };
+    }
   }
 }

@@ -91,7 +91,7 @@ export class UsersResolver {
   }
 
   @ResolveField(_type => Boolean)
-  isFollowing(@AuthUser() authUser: User, @Parent() user: User): Promise<boolean> | boolean {
+  isFollowing(@AuthUser() authUser: User, @Parent() user: User): Promise<boolean> {
     return this.usersService.isFollowing(authUser, user.id);
   }
 
