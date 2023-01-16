@@ -9,6 +9,7 @@ import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { JwtModule } from './libs/jwt/jwt.module';
 import { PhotosModule } from './photos/photos.module';
+import { CommentsModule } from './comments/comments.module';
 @Module({
   imports: [
     // ! 피리즈마 설정 모듈
@@ -45,7 +46,8 @@ import { PhotosModule } from './photos/photos.module';
     }),
     UsersModule, // ! 유저 모듈
     AuthModule, // ! 인증 모듈
-    PhotosModule, // ! 포토 모듈
+    PhotosModule,
+    CommentsModule, // ! 포토 모듈
   ],
   providers: [],
 })

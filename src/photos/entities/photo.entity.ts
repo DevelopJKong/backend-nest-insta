@@ -25,4 +25,8 @@ export class Photo extends CoreEntity {
   @Field(_type => Number, { nullable: true })
   @IsOptional()
   likes?: number;
+
+  @Field(_type => Boolean, { nullable: true })
+  @IsOptional()
+  isMine?: Boolean;
 }
