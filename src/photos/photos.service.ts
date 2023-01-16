@@ -18,12 +18,6 @@ import { SeeFeedOutput } from './dtos/see-feed.dto';
 export class PhotosService {
   constructor(private readonly prisma: PrismaService, private readonly log: LoggerService) {}
 
-  successLogger(method: string) {
-    return this.log
-      .logger()
-      .info(`${PhotosService.name} => ${this[`${method}`].name}() | Success Message ::: 데이터 호출 성공`);
-  }
-
   async user(id: number): Promise<User> {
     // ! 포토 유저 호출 성공
     const user = await this.prisma.user.findUnique({
@@ -31,7 +25,7 @@ export class PhotosService {
         id,
       },
     });
-    if (process.env.NODE_ENV === 'dev') this.successLogger(this.user.name);
+    if (process.env.NODE_ENV === 'dev') this.log.successLogger(PhotosService, this.user.name);
     return user as User;
   }
 
@@ -46,7 +40,7 @@ export class PhotosService {
         },
       },
     });
-    if (process.env.NODE_ENV === 'dev') this.successLogger(this.hashtags.name);
+    if (process.env.NODE_ENV === 'dev') this.log.successLogger(PhotosService, this.hashtags.name);
     return hashtags as Hashtag[];
   }
 
@@ -66,7 +60,7 @@ export class PhotosService {
         take: 5,
         skip: (page - 1) * 5,
       });
-    if (process.env.NODE_ENV === 'dev') this.successLogger(this.photos.name);
+    if (process.env.NODE_ENV === 'dev') this.log.successLogger(PhotosService, this.photos.name);
     return photos as Photo[];
   }
 
@@ -81,7 +75,7 @@ export class PhotosService {
         },
       },
     });
-    if (process.env.NODE_ENV === 'dev') this.successLogger(this.totalPhotos.name);
+    if (process.env.NODE_ENV === 'dev') this.log.successLogger(PhotosService, this.totalPhotos.name);
     return totalPhotos;
   }
 
