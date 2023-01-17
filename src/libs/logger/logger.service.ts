@@ -125,7 +125,4 @@ export class LoggerService {
       }
     }
   };
-  successLogger(service: { name: string }, method: string) {
-    return this.logger().info(`${service.name} => ${this[`${method}`].name}() | Success Message ::: 데이터 호출 성공`);
-  }
 }
