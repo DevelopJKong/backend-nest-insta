@@ -11,8 +11,8 @@ import { UploadPhotoInput, UploadPhotoOutput } from './dtos/upload-photo.dto';
 import { Injectable } from '@nestjs/common';
 import { Hashtag } from 'src/photos/entities/hashtag.entity';
 import { SeeHashtagInput, SeeHashtagOutput } from './dtos/see-hashtags.dto';
-import { Photo } from './entities/photo.entity';
 import { SeeFeedOutput } from './dtos/see-feed.dto';
+import { Photo } from './entities/photo.entity';
 
 @Injectable()
 export class PhotosService {
@@ -85,13 +85,27 @@ export class PhotosService {
   }
 
   async likes(id: number): Promise<number> {
-    return this.prisma.like
+    const likes = await this.prisma.like
       .count({
         where: {
           photoId: id,
         },
       })
       .catch(error => error && 0);
+    if (process.env.NODE_ENV === 'dev') this.successLogger(PhotosService, this.likes.name);
+    return likes;
+  }
+
+  async comments(id: number): Promise<number> {
+    const comments = await this.prisma.comment
+      .count({
+        where: {
+          photoId: id,
+        },
+      })
+      .catch(error => error && 0);
+    if (process.env.NODE_ENV === 'dev') this.successLogger(PhotosService, this.comments.name);
+    return comments;
   }
 
   async uploadPhoto(userId: number, { photoFile, caption }: UploadPhotoInput): Promise<UploadPhotoOutput> {
@@ -147,6 +161,7 @@ export class PhotosService {
           hashtags: await this.hashtags(photo.id),
           user: await this.user(photo.userId),
           likes: await this.likes(photo.id),
+          comments: await this.comments(photo.id),
         },
         ok: true,
         message: '사진 보기 성공',
@@ -348,7 +363,7 @@ export class PhotosService {
       });
       return {
         ok: true,
-        photos,
+        photos: photos as Photo[],
       };
     } catch (error) {
       return { ok: false, error: new Error(error), message: 'extraError' };

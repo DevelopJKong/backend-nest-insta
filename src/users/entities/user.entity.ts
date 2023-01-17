@@ -1,5 +1,5 @@
 import { Photo } from './../../photos/entities/photo.entity';
-import { IsEmail, IsEnum, IsString } from 'class-validator';
+import { IsBoolean, IsEmail, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 import { CoreEntity } from './../../common/entites/core.entity';
 import { InputType, ObjectType, Field, registerEnumType } from '@nestjs/graphql';
 import { RoleData } from '@prisma/client';
@@ -34,29 +34,48 @@ export class User extends CoreEntity {
 
   @Field(_type => String, { nullable: true })
   @IsString()
+  @IsOptional()
   bio?: string;
 
   @Field(_type => String, { nullable: true })
+  @IsString()
+  @IsOptional()
   avatar?: string;
 
   @Field(_type => [User], { nullable: true })
+  @IsOptional()
   following?: User[];
 
   @Field(_type => [User], { nullable: true })
+  @IsOptional()
   followers?: User[];
 
   @Field(_type => [Photo], { nullable: true })
+  @IsOptional()
   photos?: Photo[];
 
   @Field(_type => Number, { nullable: true })
+  @IsNumber()
+  @IsOptional()
   totalFollowing?: number;
 
   @Field(_type => Number, { nullable: true })
+  @IsNumber()
+  @IsOptional()
   totalFollowers?: number;
 
   @Field(_type => Boolean, { nullable: true })
+  @IsBoolean()
+  @IsOptional()
   isFollowing?: boolean;
 
   @Field(_type => Boolean, { nullable: true })
+  @IsBoolean()
+  @IsOptional()
   isMe?: boolean;
+
+  @Field(_type => Number, { nullable: true })
+  @IsNumber()
+  @IsOptional()
+  comments?: number;
 }

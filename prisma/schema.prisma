@@ -27,7 +27,7 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   userId    Int?
-  Comment   Comment[]
+  comments  Comment[]
 }
 
 enum RoleData {
@@ -44,8 +44,8 @@ model Photo {
   hashtags  Hashtag[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  Like      Like[]
-  Comment   Comment[]
+  likes     Like[]
+  comments  Comment[]
 }
 
 model Hashtag {

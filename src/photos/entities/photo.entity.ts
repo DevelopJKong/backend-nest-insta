@@ -2,7 +2,7 @@ import { Hashtag } from './hashtag.entity';
 import { User } from './../../users/entities/user.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { CoreEntity } from './../../common/entites/core.entity';
-import { IsOptional } from 'class-validator';
+import { IsNumber, IsOptional } from 'class-validator';
 
 @InputType('PhotoInputType', { isAbstract: true })
 @ObjectType()
@@ -29,4 +29,9 @@ export class Photo extends CoreEntity {
   @Field(_type => Boolean, { nullable: true })
   @IsOptional()
   isMine?: Boolean;
+
+  @Field(_type => Number, { nullable: true })
+  @IsNumber()
+  @IsOptional()
+  comments?: number;
 }

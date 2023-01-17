@@ -1,4 +1,4 @@
-import { Photo } from './../photos/entities/photo.entity';
+import { Photo } from 'src/photos/entities/photo.entity';
 import { SeeFollowingOutput, SeeFollowingInput } from './dtos/see-following.dto';
 import { SeeFollowersInput, SeeFollowersOutput } from './dtos/see-followers.dto';
 import { FollowUserInput, FollowUserOutput } from './dtos/follow-user.dto';

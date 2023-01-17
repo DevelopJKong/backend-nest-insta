@@ -13,5 +13,6 @@ export class SearchPhotosInput {
 @ObjectType()
 export class SearchPhotosOutput extends CoreOutput {
   @Field(_type => [Photo], { nullable: true })
+  @IsOptional()
   photos?: Photo[];
 }

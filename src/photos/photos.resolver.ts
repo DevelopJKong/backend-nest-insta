@@ -72,6 +72,10 @@ export class PhotosResolver {
   async likes(@Parent() photo: Photo): Promise<number> {
     return this.photosService.likes(photo.id);
   }
+  @ResolveField(_type => Number)
+  async comments(@Parent() photo: Photo): Promise<number> {
+    return this.photosService.comments(photo.id);
+  }
 }
 
 @Resolver(_of => Hashtag)
