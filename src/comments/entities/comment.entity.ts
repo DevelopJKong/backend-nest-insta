@@ -2,7 +2,7 @@ import { Photo } from './../../photos/entities/photo.entity';
 import { User } from './../../users/entities/user.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { CoreEntity } from './../../common/entites/core.entity';
-import { IsOptional } from 'class-validator';
+import { IsNumber, IsOptional } from 'class-validator';
 
 @InputType('CommentInputType', { isAbstract: true })
 @ObjectType()
@@ -20,4 +20,14 @@ export class Comment extends CoreEntity {
   @Field(_type => Photo, { nullable: true })
   @IsOptional()
   photo?: Photo;
+
+  @Field(_type => Number, { nullable: true })
+  @IsNumber()
+  @IsOptional()
+  userId: number;
+
+  @Field(_type => Number, { nullable: true })
+  @IsNumber()
+  @IsOptional()
+  photoId: number;
 }

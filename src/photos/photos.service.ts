@@ -1,3 +1,4 @@
+import { SeePhotoCommentsInput, SeePhotoCommentsOutput } from './dtos/see-photo-comments.dto';
 import { SeeLikesOutput } from './dtos/see-likes.dto';
 import { ToggleLikeInput, ToggleLikeOutput } from './dtos/toggle-like.dto';
 import { EditPhotoInput, EditPhotoOutput } from './dtos/edit-photo.dto';
@@ -13,6 +14,7 @@ import { Hashtag } from 'src/photos/entities/hashtag.entity';
 import { SeeHashtagInput, SeeHashtagOutput } from './dtos/see-hashtags.dto';
 import { SeeFeedOutput } from './dtos/see-feed.dto';
 import { Photo } from './entities/photo.entity';
+import { Comment } from 'src/comments/entities/comment.entity';
 
 @Injectable()
 export class PhotosService {
@@ -364,6 +366,27 @@ export class PhotosService {
       return {
         ok: true,
         photos: photos as Photo[],
+      };
+    } catch (error) {
+      return { ok: false, error: new Error(error), message: 'extraError' };
+    }
+  }
+
+  async seePhotoComments({ id, page }: SeePhotoCommentsInput): Promise<SeePhotoCommentsOutput> {
+    try {
+      const comments = await this.prisma.comment.findMany({
+        where: {
+          photoId: id,
+        },
+        orderBy: {
+          createdAt: 'asc',
+        },
+        take: 5,
+        skip: (page - 1) * 5,
+      });
+      return {
+        ok: true,
+        comments: comments as Comment[],
       };
     } catch (error) {
       return { ok: false, error: new Error(error), message: 'extraError' };

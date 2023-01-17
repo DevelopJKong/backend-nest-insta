@@ -13,19 +13,11 @@ import { Role } from 'src/libs/auth/role.decorator';
 import { Photo } from './entities/photo.entity';
 import { Hashtag } from 'src/photos/entities/hashtag.entity';
 import { SeeHashtagInput, SeeHashtagOutput } from './dtos/see-hashtags.dto';
+import { SeePhotoCommentsOutput, SeePhotoCommentsInput } from './dtos/see-photo-comments.dto';
 
 @Resolver(_of => Photo)
 export class PhotosResolver {
   constructor(private readonly photosService: PhotosService) {}
-
-  @Mutation(_return => UploadPhotoOutput)
-  @Role([RoleData.USER])
-  async uploadPhoto(
-    @AuthUser() authUser: User,
-    @Args('input') uploadPhotoInput: UploadPhotoInput,
-  ): Promise<UploadPhotoOutput> {
-    return this.photosService.uploadPhoto(authUser.id, uploadPhotoInput);
-  }
 
   @Query(_return => SeePhotoOutput)
   @Role([RoleData.USER])
@@ -51,6 +43,12 @@ export class PhotosResolver {
     return this.photosService.seeFeed(authUser.id);
   }
 
+  @Query(_return => SeePhotoCommentsOutput)
+  @Role([RoleData.USER])
+  async seePhotoComments(@Args('input') seePhotoCommentsInput: SeePhotoCommentsInput): Promise<SeePhotoCommentsOutput> {
+    return this.photosService.seePhotoComments(seePhotoCommentsInput);
+  }
+
   @Mutation(_return => ToggleLikeOutput)
   @Role([RoleData.USER])
   async toggleLike(
@@ -58,6 +56,15 @@ export class PhotosResolver {
     @Args('input') toggleLikeInput: ToggleLikeInput,
   ): Promise<ToggleLikeOutput> {
     return this.photosService.toggleLike(toggleLikeInput, authUser.id);
+  }
+
+  @Mutation(_return => UploadPhotoOutput)
+  @Role([RoleData.USER])
+  async uploadPhoto(
+    @AuthUser() authUser: User,
+    @Args('input') uploadPhotoInput: UploadPhotoInput,
+  ): Promise<UploadPhotoOutput> {
+    return this.photosService.uploadPhoto(authUser.id, uploadPhotoInput);
   }
 
   @ResolveField(_type => User)
