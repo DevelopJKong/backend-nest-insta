@@ -110,6 +110,13 @@ export class PhotosService {
     return comments;
   }
 
+  isMine(id: number, userId: number) {
+    if (userId) {
+      return false;
+    }
+    return id === userId;
+  }
+
   async uploadPhoto(userId: number, { photoFile, caption }: UploadPhotoInput): Promise<UploadPhotoOutput> {
     try {
       let hashtagObj = [];
@@ -164,6 +171,7 @@ export class PhotosService {
           user: await this.user(photo.userId),
           likes: await this.likes(photo.id),
           comments: await this.comments(photo.id),
+          isMine: this.isMine(photo.userId, photo.id),
         },
         ok: true,
         message: '사진 보기 성공',

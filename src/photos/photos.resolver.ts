@@ -83,6 +83,10 @@ export class PhotosResolver {
   async comments(@Parent() photo: Photo): Promise<number> {
     return this.photosService.comments(photo.id);
   }
+  @ResolveField(_type => Boolean)
+  isMine(@Parent() photo: Photo, @AuthUser() authUser: User): boolean {
+    return this.photosService.isMine(photo.id, authUser.id);
+  }
 }
 
 @Resolver(_of => Hashtag)

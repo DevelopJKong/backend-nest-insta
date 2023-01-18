@@ -6,6 +6,13 @@ import { Injectable } from '@nestjs/common';
 export class CommentsService {
   constructor(private readonly prisma: PrismaService) {}
 
+  isMine(id: number, userId: number) {
+    if (!userId) {
+      return false;
+    }
+    return userId === id;
+  }
+
   async createComment({ photoId, payload }: CreateCommentInput, userId: number): Promise<CreateCommentOutput> {
     try {
       const ok = await this.prisma.photo.findUnique({

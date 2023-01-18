@@ -1,7 +1,7 @@
 import { User } from 'src/users/entities/user.entity';
 import { RoleData } from '@prisma/client';
 import { CreateCommentInput, CreateCommentOutput } from './dtos/create-comment.dto';
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Parent, ResolveField, Resolver } from '@nestjs/graphql';
 import { CommentsService } from './comments.service';
 import { AuthUser } from 'src/libs/auth/auth-user.decorator';
 import { Role } from 'src/libs/auth/role.decorator';
@@ -18,5 +18,10 @@ export class CommentsResolver {
     @AuthUser() authUser: User,
   ): Promise<CreateCommentOutput> {
     return this.commentsService.createComment(createCommentInput, authUser.id);
+  }
+
+  @ResolveField(_type => Boolean)
+  isMine(@Parent() comment: Comment, @AuthUser() authUser: User): boolean {
+    return this.commentsService.isMine(comment.id, authUser.id);
   }
 }
