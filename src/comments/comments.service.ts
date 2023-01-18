@@ -1,3 +1,4 @@
+import { EditCommentInput } from './dtos/edit-comment.dto';
 import { DeleteCommentInput, DeleteCommentOutput } from './dtos/delete-comment.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCommentInput, CreateCommentOutput } from './dtos/create-comment.dto';
@@ -94,6 +95,51 @@ export class CommentsService {
       return {
         ok: true,
         message: '코멘트 삭제 성공',
+      };
+    } catch (error) {
+      return { ok: false, error: new Error(error), message: 'extraError' };
+    }
+  }
+
+  async editComment({ id, payload }: EditCommentInput, userId: number) {
+    const comment = await this.prisma.comment.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        userId: true,
+      },
+    });
+
+    if (!comment) {
+      return {
+        ok: false,
+        error: new Error('notFound'),
+        message: '코멘트가 없습니다.',
+      };
+    }
+
+    if (comment.userId !== userId) {
+      return {
+        ok: false,
+        error: new Error('notAuthorized'),
+        message: '권한이 없습니다.',
+      };
+    }
+
+    await this.prisma.comment.update({
+      where: {
+        id,
+      },
+      data: {
+        payload,
+      },
+    });
+
+    try {
+      return {
+        ok: true,
+        message: '코멘트 수정 성공',
       };
     } catch (error) {
       return { ok: false, error: new Error(error), message: 'extraError' };

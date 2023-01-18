@@ -1,3 +1,4 @@
+import { EditCommentInput, EditCommentOutput } from './dtos/edit-comment.dto';
 import { DeleteCommentOutput, DeleteCommentInput } from './dtos/delete-comment.dto';
 import { User } from 'src/users/entities/user.entity';
 import { RoleData } from '@prisma/client';
@@ -28,6 +29,15 @@ export class CommentsResolver {
     @AuthUser() authUser: User,
   ): Promise<DeleteCommentOutput> {
     return this.commentsService.deleteComment(deleteCommentInput, authUser.id);
+  }
+
+  @Mutation(_return => EditCommentOutput)
+  @Role([RoleData.USER])
+  async editComment(
+    @Args('input') editCommentInput: EditCommentInput,
+    @AuthUser() authUser: User,
+  ): Promise<EditCommentOutput> {
+    return this.commentsService.editComment(editCommentInput, authUser.id);
   }
 
   @ResolveField(_type => Boolean)
