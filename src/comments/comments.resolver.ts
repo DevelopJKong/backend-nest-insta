@@ -1,3 +1,4 @@
+import { DeleteCommentOutput, DeleteCommentInput } from './dtos/delete-comment.dto';
 import { User } from 'src/users/entities/user.entity';
 import { RoleData } from '@prisma/client';
 import { CreateCommentInput, CreateCommentOutput } from './dtos/create-comment.dto';
@@ -18,6 +19,15 @@ export class CommentsResolver {
     @AuthUser() authUser: User,
   ): Promise<CreateCommentOutput> {
     return this.commentsService.createComment(createCommentInput, authUser.id);
+  }
+
+  @Mutation(_return => DeleteCommentOutput)
+  @Role([RoleData.USER])
+  async deleteComment(
+    @Args('input') deleteCommentInput: DeleteCommentInput,
+    @AuthUser() authUser: User,
+  ): Promise<DeleteCommentOutput> {
+    return this.commentsService.deleteComment(deleteCommentInput, authUser.id);
   }
 
   @ResolveField(_type => Boolean)

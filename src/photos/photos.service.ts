@@ -15,6 +15,7 @@ import { SeeHashtagInput, SeeHashtagOutput } from './dtos/see-hashtags.dto';
 import { SeeFeedOutput } from './dtos/see-feed.dto';
 import { Photo } from './entities/photo.entity';
 import { Comment } from 'src/comments/entities/comment.entity';
+import { DeletePhotoInput, DeletePhotoOutput } from './dtos/delete-photo.dto';
 
 @Injectable()
 export class PhotosService {
@@ -395,6 +396,45 @@ export class PhotosService {
       return {
         ok: true,
         comments: comments as Comment[],
+      };
+    } catch (error) {
+      return { ok: false, error: new Error(error), message: 'extraError' };
+    }
+  }
+  async deletePhoto({ id }: DeletePhotoInput, userId: number): Promise<DeletePhotoOutput> {
+    try {
+      const photo = await this.prisma.photo.findUnique({
+        where: {
+          id,
+        },
+        select: {
+          userId: true,
+        },
+      });
+      if (!photo) {
+        return {
+          ok: false,
+          error: new Error('notFound'),
+          message: '포토가 없습니다.',
+        };
+      }
+
+      if (photo.userId !== userId) {
+        return {
+          ok: false,
+          error: new Error('unAuthorized'),
+          message: '포토를 삭제할 권한이 없습니다.',
+        };
+      }
+
+      await this.prisma.photo.delete({
+        where: {
+          id,
+        },
+      });
+      return {
+        ok: true,
+        message: '사진 삭제 성공',
       };
     } catch (error) {
       return { ok: false, error: new Error(error), message: 'extraError' };

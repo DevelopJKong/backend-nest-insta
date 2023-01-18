@@ -1,3 +1,4 @@
+import { DeletePhotoInput, DeletePhotoOutput } from './dtos/delete-photo.dto';
 import { SeeFeedOutput } from './dtos/see-feed.dto';
 import { SeeLikesOutput, SeeLikesInput } from './dtos/see-likes.dto';
 import { SearchPhotosInput, SearchPhotosOutput } from './dtos/search-photos.dto';
@@ -65,6 +66,15 @@ export class PhotosResolver {
     @Args('input') uploadPhotoInput: UploadPhotoInput,
   ): Promise<UploadPhotoOutput> {
     return this.photosService.uploadPhoto(authUser.id, uploadPhotoInput);
+  }
+
+  @Mutation(_return => DeletePhotoOutput)
+  @Role([RoleData.USER])
+  async deletePhoto(
+    @Args('input') deletePhotoInput: DeletePhotoInput,
+    @AuthUser() authUser: User,
+  ): Promise<DeletePhotoOutput> {
+    return this.photosService.deletePhoto(deletePhotoInput, authUser.id);
   }
 
   @ResolveField(_type => User)
