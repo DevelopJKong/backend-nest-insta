@@ -19,13 +19,14 @@ import { fileFolder } from 'src/common/common.constants';
 import { UnFollowUserInput, UnFollowUserOutput } from './dtos/un-follow-user.dto';
 import { User } from './entities/user.entity';
 import { SearchUsersInput, SearchUsersOutput } from './dtos/search-users.dto';
-
+import { UploadsService } from '../uploads/uploads.service';
 @Injectable()
 export class UsersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly log: LoggerService,
     private readonly jwtService: JwtService,
+    private readonly uploadsService: UploadsService,
   ) {}
 
   successLogger(service: { name: string }, method: string) {
@@ -259,9 +260,7 @@ export class UsersService {
 
         // ! 배포 환경에서 파일 저장
         if (process.env.NODE_ENV === 'prod') {
-          const prodResult = createReadStream().pipe(createWriteStream(join(userFileFolder, `./${filename}`)));
-          filePath = prodResult.path as string;
-          avatarFilePath = `${BACKEND_URL}` + join('/files', filePath.split(fileFolder)[1]);
+          avatarFilePath = await this.uploadsService.uploadFile(avatarField, userId, 'avatar');
         }
       }
       let hashedPassword: string;

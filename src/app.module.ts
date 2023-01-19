@@ -10,6 +10,7 @@ import * as Joi from 'joi';
 import { JwtModule } from './libs/jwt/jwt.module';
 import { PhotosModule } from './photos/photos.module';
 import { CommentsModule } from './comments/comments.module';
+import { UploadsModule } from './uploads/uploads.module';
 @Module({
   imports: [
     // ! 피리즈마 설정 모듈
@@ -44,10 +45,15 @@ import { CommentsModule } from './comments/comments.module';
     JwtModule.forRoot({
       privateKey: process.env.PRIVATE_KEY,
     }),
+    UploadsModule.forRoot({
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      bucketName: process.env.AWS_BUCKET_NAME,
+    }), // ! 업로드 모듈
     UsersModule, // ! 유저 모듈
     AuthModule, // ! 인증 모듈
-    PhotosModule,
-    CommentsModule, // ! 포토 모듈
+    PhotosModule, // ! 포토 모듈
+    CommentsModule, // ! 댓글 모듈
   ],
   providers: [],
 })

@@ -1,3 +1,4 @@
+import { UploadsService } from './../uploads/uploads.service';
 import { SeePhotoCommentsInput, SeePhotoCommentsOutput } from './dtos/see-photo-comments.dto';
 import { SeeLikesOutput } from './dtos/see-likes.dto';
 import { ToggleLikeInput, ToggleLikeOutput } from './dtos/toggle-like.dto';
@@ -19,7 +20,11 @@ import { DeletePhotoInput, DeletePhotoOutput } from './dtos/delete-photo.dto';
 
 @Injectable()
 export class PhotosService {
-  constructor(private readonly prisma: PrismaService, private readonly log: LoggerService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly log: LoggerService,
+    private readonly uploadsService: UploadsService,
+  ) {}
   successLogger(service: { name: string }, method: string) {
     return this.log
       .logger()
@@ -121,15 +126,19 @@ export class PhotosService {
   async uploadPhoto(userId: number, { photoFile, caption }: UploadPhotoInput): Promise<UploadPhotoOutput> {
     try {
       let hashtagObj = [];
-
+      let filePath: string;
       if (caption) {
         hashtagObj = processHashtags(caption);
       }
-
-      const { filename } = await photoFile;
+      if (process.env.NODE_ENV === 'dev') {
+        const { filename } = await photoFile;
+        filePath = filename;
+      } else {
+        filePath = await this.uploadsService.uploadFile(photoFile, userId, 'upload');
+      }
       await this.prisma.photo.create({
         data: {
-          file: filename,
+          file: filePath,
           caption,
           user: {
             connect: {
