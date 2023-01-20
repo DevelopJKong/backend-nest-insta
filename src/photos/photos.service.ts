@@ -158,11 +158,7 @@ export class PhotosService {
         message: '사진 업로드 성공',
       };
     } catch (error) {
-      return {
-        ok: false,
-        error: new Error(error),
-        message: 'extraError',
-      };
+      return { ok: false, error: new Error(error), message: 'extraError' };
     }
   }
 
@@ -187,11 +183,7 @@ export class PhotosService {
         message: '사진 보기 성공',
       };
     } catch (error) {
-      return {
-        ok: false,
-        error: new Error(error),
-        message: 'extraError',
-      };
+      return { ok: false, error: new Error(error), message: 'extraError' };
     }
   }
 
@@ -216,11 +208,7 @@ export class PhotosService {
         message: '해시태크 보기 성공',
       };
     } catch (error) {
-      return {
-        ok: false,
-        error: new Error(error),
-        message: 'extraError',
-      };
+      return { ok: false, error: new Error(error), message: 'extraError' };
     }
   }
   async searchPhotos({ keyword }: SearchPhotosInput): Promise<SearchPhotosOutput> {
