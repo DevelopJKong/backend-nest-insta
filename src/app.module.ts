@@ -11,6 +11,7 @@ import { JwtModule } from './libs/jwt/jwt.module';
 import { PhotosModule } from './photos/photos.module';
 import { CommentsModule } from './comments/comments.module';
 import { UploadsModule } from './uploads/uploads.module';
+import { MessagesModule } from './messages/messages.module';
 @Module({
   imports: [
     // ! 피리즈마 설정 모듈
@@ -54,6 +55,7 @@ import { UploadsModule } from './uploads/uploads.module';
     AuthModule, // ! 인증 모듈
     PhotosModule, // ! 포토 모듈
     CommentsModule, // ! 댓글 모듈
+    MessagesModule,
   ],
   providers: [],
 })

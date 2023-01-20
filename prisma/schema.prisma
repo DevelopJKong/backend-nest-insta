@@ -24,10 +24,12 @@ model User {
   likes     Like[]
   followers User[]    @relation("FollowRelation")
   following User[]    @relation("FollowRelation")
+  comments  Comment[]
+  rooms     Room[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   userId    Int?
-  comments  Comment[]
+  Message   Message[]
 }
 
 enum RoleData {
@@ -77,4 +79,23 @@ model Comment {
   updatedAt DateTime @updatedAt
   userId    Int
   photoId   Int
+}
+
+model Room {
+  id        Int       @id @default(autoincrement())
+  users     User[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Message   Message[]
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  payload   String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  room      Room     @relation(fields: [roomId], references: [id])
+  roomId    Int
+  createAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
