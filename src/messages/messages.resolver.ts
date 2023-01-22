@@ -7,22 +7,27 @@ import { User } from './../users/entities/user.entity';
 import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { MessagesService } from './messages.service';
 import { AuthUser } from 'src/libs/auth/auth-user.decorator';
+import { RoleData } from '@prisma/client';
+import { Role } from 'src/libs/auth/role.decorator';
 
 @Resolver(_of => Message)
 export class MessagesResolver {
   constructor(private readonly messageService: MessagesService) {}
 
   @Query(_type => SeeRoomsOutput)
+  @Role([RoleData.USER])
   async seeRooms(@AuthUser() authUser: User): Promise<SeeRoomsOutput> {
     return this.messageService.seeRooms(authUser.id);
   }
 
   @Query(_type => SeeRoomOutput)
+  @Role([RoleData.USER])
   async seeRoom(@Args('input') seeRoomInput: SeeRoomInput, @AuthUser() authUser: User): Promise<SeeRoomOutput> {
     return this.messageService.seeRoom(seeRoomInput, authUser);
   }
 
   @Mutation(_type => SendMessageOutput)
+  @Role([RoleData.USER])
   async sendMessage(
     @Args('input') sendMessageInput: SendMessageInput,
     @AuthUser() authUser: User,
@@ -31,6 +36,7 @@ export class MessagesResolver {
   }
 
   @Mutation(_type => ReadMessageOutput)
+  @Role([RoleData.USER])
   async readMessage(
     @Args('input') readMessageInput: ReadMessageInput,
     @AuthUser() authUser: User,
@@ -47,6 +53,7 @@ export class MessagesResolver {
     return this.messageService.messages(message.id);
   }
   @ResolveField(_type => Number)
+  @Role([RoleData.USER])
   async unreadTotal(@Parent() message: Message, @AuthUser() authUser: User): Promise<number> {
     return this.messageService.unreadTotal(message.id, authUser);
   }
