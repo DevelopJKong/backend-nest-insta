@@ -9,13 +9,13 @@ import { CoreEntity } from 'src/common/entites/core.entity';
 export class Room extends CoreEntity {
   @Field(_type => [Message], { nullable: true })
   @IsOptional()
-  messages: Message[];
+  messages?: Message[];
 
   @Field(_type => [User], { nullable: true })
   @IsOptional()
-  users: User[];
+  users?: User[];
 
   @Field(_type => [Room], { nullable: true })
   @IsOptional()
-  rooms: Room[];
+  rooms?: Room[];
 }

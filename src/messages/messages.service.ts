@@ -1,16 +1,37 @@
+import { Message } from './entities/message.entity';
 import { User } from './../users/entities/user.entity';
 import { SendMessageInput } from './dtos/send-message.dto';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { SeeRoomOutput } from './dtos/see-room.dto';
-import { Room as RoomType } from '@prisma/client';
+import { SeeRoomsOutput } from './dtos/see-rooms.dto';
 import { Room } from './entities/room.entity';
+import { SeeRoomInput, SeeRoomOutput } from './dtos/see-room.dto';
 
 @Injectable()
 export class MessagesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async seeRooms(userId: number): Promise<SeeRoomOutput> {
+  async users(messageId: number): Promise<User[]> {
+    const users = await this.prisma.room
+      .findUnique({
+        where: {
+          id: messageId,
+        },
+      })
+      .users();
+    return users as User[];
+  }
+
+  async messages(roomId: number): Promise<Message[]> {
+    const messages = await this.prisma.message.findMany({
+      where: {
+        roomId,
+      },
+    });
+    return messages as Message[];
+  }
+
+  async seeRooms(userId: number): Promise<SeeRoomsOutput> {
     const rooms = await this.prisma.room.findMany({
       where: {
         users: {
@@ -22,13 +43,14 @@ export class MessagesService {
     });
     return {
       ok: true,
+      message: '채팅방 목록 호출 성공',
       rooms: rooms as Room[],
     };
   }
 
   async sendMessage({ payload, roomId, userId }: SendMessageInput, authUser: User) {
     try {
-      let room: RoomType;
+      let room: Room;
       if (userId) {
         const user = await this.prisma.user.findUnique({
           where: {
@@ -95,6 +117,26 @@ export class MessagesService {
       return {
         ok: true,
         message: '메시지를 전송 하였습니다.',
+      };
+    } catch (error) {
+      return { ok: false, error: new Error(error), message: 'extraError' };
+    }
+  }
+  async seeRoom({ id }: SeeRoomInput, authUser: User): Promise<SeeRoomOutput> {
+    try {
+      const room = await this.prisma.room.findFirst({
+        where: {
+          id,
+          users: {
+            some: {
+              id: authUser.id,
+            },
+          },
+        },
+      });
+      return {
+        ok: true,
+        room: room as Room,
       };
     } catch (error) {
       return { ok: false, error: new Error(error), message: 'extraError' };

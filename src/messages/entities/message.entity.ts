@@ -11,6 +11,14 @@ export class Message extends CoreEntity {
   @IsString()
   payload: string;
 
+  @Field(_type => Number, { nullable: true })
+  @IsOptional()
+  roomId?: number;
+
+  @Field(_type => Number, { nullable: true })
+  @IsOptional()
+  userId?: number;
+
   @Field(_type => User, { nullable: true })
   @IsOptional()
   user?: User;
