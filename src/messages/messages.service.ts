@@ -1,3 +1,4 @@
+import { LoggerService } from './../libs/logger/logger.service';
 import { Message } from './entities/message.entity';
 import { User } from './../users/entities/user.entity';
 import { SendMessageInput } from './dtos/send-message.dto';
@@ -6,10 +7,17 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { SeeRoomsOutput } from './dtos/see-rooms.dto';
 import { Room } from './entities/room.entity';
 import { SeeRoomInput, SeeRoomOutput } from './dtos/see-room.dto';
+import { ReadMessageInput } from './dtos/read-message.dto';
 
 @Injectable()
 export class MessagesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService, private readonly log: LoggerService) {}
+
+  successLogger(service: { name: string }, method: string) {
+    return this.log
+      .logger()
+      .info(`${service.name} => ${this[`${method}`].name}() | Success Message ::: 데이터 호출 성공`);
+  }
 
   async users(messageId: number): Promise<User[]> {
     const users = await this.prisma.room
@@ -19,6 +27,7 @@ export class MessagesService {
         },
       })
       .users();
+    if (process.env.NODE_ENV === 'dev') this.successLogger(MessagesService, this.users.name);
     return users as User[];
   }
 
@@ -28,7 +37,27 @@ export class MessagesService {
         roomId,
       },
     });
+    if (process.env.NODE_ENV === 'dev') this.successLogger(MessagesService, this.messages.name);
     return messages as Message[];
+  }
+
+  async unreadTotal(roomId: number, authUser: User): Promise<number> {
+    if (!authUser) {
+      return 0;
+    }
+    const count = await this.prisma.message.count({
+      where: {
+        read: false,
+        roomId,
+        user: {
+          id: {
+            not: authUser.id,
+          },
+        },
+      },
+    });
+    if (process.env.NODE_ENV === 'dev') this.successLogger(MessagesService, this.messages.name);
+    return count;
   }
 
   async seeRooms(userId: number): Promise<SeeRoomsOutput> {
@@ -137,6 +166,51 @@ export class MessagesService {
       return {
         ok: true,
         room: room as Room,
+      };
+    } catch (error) {
+      return { ok: false, error: new Error(error), message: 'extraError' };
+    }
+  }
+  async readMessage({ id }: ReadMessageInput, userId: number) {
+    try {
+      const message = await this.prisma.message.findFirst({
+        where: {
+          id,
+          userId: {
+            not: userId,
+          },
+          room: {
+            users: {
+              some: {
+                id: userId,
+              },
+            },
+          },
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      if (!message) {
+        return {
+          ok: false,
+          error: new Error('notFound'),
+          message: '메시지가 존재 하지 않습니다.',
+        };
+      }
+
+      await this.prisma.message.update({
+        where: {
+          id,
+        },
+        data: {
+          read: true,
+        },
+      });
+      return {
+        ok: true,
+        message: '메시지를 읽었습니다.',
       };
     } catch (error) {
       return { ok: false, error: new Error(error), message: 'extraError' };

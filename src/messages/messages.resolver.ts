@@ -1,3 +1,4 @@
+import { ReadMessageInput, ReadMessageOutput } from './dtos/read-message.dto';
 import { Message } from './entities/message.entity';
 import { SeeRoomOutput, SeeRoomInput } from './dtos/see-room.dto';
 import { SendMessageOutput, SendMessageInput } from './dtos/send-message.dto';
@@ -29,6 +30,14 @@ export class MessagesResolver {
     return this.messageService.sendMessage(sendMessageInput, authUser);
   }
 
+  @Mutation(_type => ReadMessageOutput)
+  async readMessage(
+    @Args('input') readMessageInput: ReadMessageInput,
+    @AuthUser() authUser: User,
+  ): Promise<ReadMessageOutput> {
+    return this.messageService.readMessage(readMessageInput, authUser.id);
+  }
+
   @ResolveField(_type => [User])
   async users(@Parent() message: Message): Promise<User[]> {
     return this.messageService.users(message.id);
@@ -36,5 +45,9 @@ export class MessagesResolver {
   @ResolveField(_type => [Message])
   async message(@Parent() message: Message): Promise<Message[]> {
     return this.messageService.messages(message.id);
+  }
+  @ResolveField(_type => Number)
+  async unreadTotal(@Parent() message: Message, @AuthUser() authUser: User): Promise<number> {
+    return this.messageService.unreadTotal(message.id, authUser);
   }
 }

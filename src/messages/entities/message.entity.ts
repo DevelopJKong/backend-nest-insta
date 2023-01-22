@@ -26,4 +26,8 @@ export class Message extends CoreEntity {
   @Field(_type => Room, { nullable: true })
   @IsOptional()
   room?: Room;
+
+  @Field(_type => Boolean, { nullable: true })
+  @IsOptional()
+  read?: boolean;
 }

@@ -15,7 +15,7 @@ export class Room extends CoreEntity {
   @IsOptional()
   users?: User[];
 
-  @Field(_type => [Room], { nullable: true })
+  @Field(_type => Number, { nullable: true })
   @IsOptional()
-  rooms?: Room[];
+  unreadTotal?: number;
 }
