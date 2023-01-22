@@ -1,14 +1,13 @@
 import { Message } from './entities/message.entity';
-import { SeeRoomOutput } from './dtos/see-room.dto';
+import { SeeRoomOutput, SeeRoomInput } from './dtos/see-room.dto';
 import { SendMessageOutput, SendMessageInput } from './dtos/send-message.dto';
 import { SeeRoomsOutput } from './dtos/see-rooms.dto';
 import { User } from './../users/entities/user.entity';
 import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { MessagesService } from './messages.service';
 import { AuthUser } from 'src/libs/auth/auth-user.decorator';
-import { Room } from './entities/room.entity';
 
-@Resolver()
+@Resolver(_of => Message)
 export class MessagesResolver {
   constructor(private readonly messageService: MessagesService) {}
 
@@ -18,7 +17,7 @@ export class MessagesResolver {
   }
 
   @Query(_type => SeeRoomOutput)
-  async seeRoom(@Args('input') seeRoomInput, @AuthUser() authUser: User): Promise<SeeRoomOutput> {
+  async seeRoom(@Args('input') seeRoomInput: SeeRoomInput, @AuthUser() authUser: User): Promise<SeeRoomOutput> {
     return this.messageService.seeRoom(seeRoomInput, authUser);
   }
 
@@ -30,11 +29,11 @@ export class MessagesResolver {
     return this.messageService.sendMessage(sendMessageInput, authUser);
   }
 
-  @ResolveField(_type => Room)
+  @ResolveField(_type => [User])
   async users(@Parent() message: Message): Promise<User[]> {
     return this.messageService.users(message.id);
   }
-  @ResolveField(_type => Room)
+  @ResolveField(_type => [Message])
   async message(@Parent() message: Message): Promise<Message[]> {
     return this.messageService.messages(message.id);
   }
