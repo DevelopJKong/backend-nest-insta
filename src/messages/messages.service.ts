@@ -1,8 +1,10 @@
+import { PubSub } from 'graphql-subscriptions';
+import { NEW_MESSAGE, PUB_SUB } from './../common/common.constants';
 import { LoggerService } from './../libs/logger/logger.service';
 import { Message } from './entities/message.entity';
 import { User } from './../users/entities/user.entity';
 import { SendMessageInput } from './dtos/send-message.dto';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { SeeRoomsOutput } from './dtos/see-rooms.dto';
 import { Room } from './entities/room.entity';
@@ -11,7 +13,11 @@ import { ReadMessageInput } from './dtos/read-message.dto';
 
 @Injectable()
 export class MessagesService {
-  constructor(private readonly prisma: PrismaService, private readonly log: LoggerService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly log: LoggerService,
+    @Inject(PUB_SUB) private readonly pubSub: PubSub,
+  ) {}
 
   successLogger(service: { name: string }, method: string) {
     return this.log
@@ -127,7 +133,7 @@ export class MessagesService {
           };
         }
       }
-      await this.prisma.message.create({
+      const message = await this.prisma.message.create({
         data: {
           payload,
           room: {
@@ -142,10 +148,11 @@ export class MessagesService {
           },
         },
       });
-
+      // * 메시지 전송시 채팅방 목록에 새로운 메시지가 온 채팅방이 있으면 새로운 메시지를 보여줌
+      await this.pubSub.publish(NEW_MESSAGE, { roomUpdates: { ...message } });
       return {
         ok: true,
-        message: '메시지를 전송 하였습니다.',
+        message: '메시지를 전송 성공',
       };
     } catch (error) {
       return { ok: false, error: new Error(error), message: 'extraError' };

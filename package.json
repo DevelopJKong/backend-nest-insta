@@ -39,6 +39,7 @@
     "cross-env": "^7.0.3",
     "eslint-plugin-prettier": "^4.2.1",
     "graphql": "^16.6.0",
+    "graphql-subscriptions": "^2.0.0",
     "graphql-upload": "^14.0.0",
     "joi": "^17.7.0",
     "jsonwebtoken": "^9.0.0",

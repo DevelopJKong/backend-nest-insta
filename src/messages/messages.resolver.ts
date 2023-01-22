@@ -1,18 +1,21 @@
+import { NEW_MESSAGE, PUB_SUB } from './../common/common.constants';
+import { PubSub } from 'graphql-subscriptions';
 import { ReadMessageInput, ReadMessageOutput } from './dtos/read-message.dto';
 import { Message } from './entities/message.entity';
 import { SeeRoomOutput, SeeRoomInput } from './dtos/see-room.dto';
 import { SendMessageOutput, SendMessageInput } from './dtos/send-message.dto';
 import { SeeRoomsOutput } from './dtos/see-rooms.dto';
 import { User } from './../users/entities/user.entity';
-import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Parent, Query, ResolveField, Resolver, Subscription } from '@nestjs/graphql';
 import { MessagesService } from './messages.service';
 import { AuthUser } from 'src/libs/auth/auth-user.decorator';
 import { RoleData } from '@prisma/client';
 import { Role } from 'src/libs/auth/role.decorator';
+import { Inject } from '@nestjs/common';
 
-@Resolver(_of => Message)
+@Resolver((_of?: void) => Message)
 export class MessagesResolver {
-  constructor(private readonly messageService: MessagesService) {}
+  constructor(private readonly messageService: MessagesService, @Inject(PUB_SUB) private readonly pubSub: PubSub) {}
 
   @Query(_type => SeeRoomsOutput)
   @Role([RoleData.USER])
@@ -44,6 +47,10 @@ export class MessagesResolver {
     return this.messageService.readMessage(readMessageInput, authUser.id);
   }
 
+  @Subscription(_returns => Message)
+  async roomUpdates() {
+    return this.pubSub.asyncIterator(NEW_MESSAGE);
+  }
   @ResolveField(_type => [User])
   async users(@Parent() message: Message): Promise<User[]> {
     return this.messageService.users(message.id);

@@ -4,6 +4,18 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { LoggerService } from './logger.service';
 
+interface ITypeName {
+  SUBSCRIPTION: string;
+  QUERY: string;
+  MUTATION: string;
+}
+
+const TYPE_NAME = {
+  SUBSCRIPTION: 'Subscription',
+  QUERY: 'Query',
+  MUTATION: 'Mutation',
+} as ITypeName;
+
 export interface Response<T> {
   data: T;
 }
@@ -12,6 +24,11 @@ export class LoggerInterceptor<T> implements NestInterceptor<T, Response<T>> {
   constructor(private readonly log: LoggerService) {}
   intercept(context: ExecutionContext, next: CallHandler): Observable<Response<T>> {
     const info = GqlExecutionContext.create(context).getInfo();
+    if (info.path.typename === TYPE_NAME.SUBSCRIPTION) {
+      this.log.logger().info(`${info.path.typename} => ${info.path.key}() | Subscription 호출 성공`);
+      return next.handle();
+    }
+
     return next.handle().pipe(
       map(data => {
         if (data.ok) {

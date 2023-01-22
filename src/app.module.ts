@@ -12,6 +12,7 @@ import { PhotosModule } from './photos/photos.module';
 import { CommentsModule } from './comments/comments.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { MessagesModule } from './messages/messages.module';
+import { CommonModule } from './common/common.module';
 @Module({
   imports: [
     // ! 피리즈마 설정 모듈
@@ -24,11 +25,14 @@ import { MessagesModule } from './messages/messages.module';
       validationSchema: Joi.object({
         NODE_ENV: Joi.string().valid('dev', 'prod').required(),
         PRIVATE_KEY: Joi.string().required(),
+        AWS_ACCESS_KEY_ID: Joi.string().required(),
+        AWS_SECRET_ACCESS_KEY: Joi.string().required(),
+        AWS_BUCKET_NAME: Joi.string().required(),
       }),
     }),
-
     // ! GraphQL 설정 모듈
     GraphQLModule.forRoot<ApolloDriverConfig>({
+      fieldResolverEnhancers: ['interceptors'],
       installSubscriptionHandlers: true,
       driver: ApolloDriver,
       autoSchemaFile: true,
@@ -56,6 +60,7 @@ import { MessagesModule } from './messages/messages.module';
     PhotosModule, // ! 포토 모듈
     CommentsModule, // ! 댓글 모듈
     MessagesModule,
+    CommonModule,
   ],
   providers: [],
 })
