@@ -13,6 +13,8 @@ import { CommentsModule } from './comments/comments.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { MessagesModule } from './messages/messages.module';
 import { CommonModule } from './common/common.module';
+
+const TOKEN_KEY = 'x-jwt' as const;
 @Module({
   imports: [
     // ! 피리즈마 설정 모듈
@@ -36,10 +38,18 @@ import { CommonModule } from './common/common.module';
       installSubscriptionHandlers: true,
       driver: ApolloDriver,
       autoSchemaFile: true,
-      context: ({ req, connection }) => {
-        const TOKEN_KEY = 'x-jwt';
+      subscriptions: {
+        'subscriptions-transport-ws': {
+          onConnect: (connectionParams: { [TOKEN_KEY]: string }) => {
+            return {
+              token: connectionParams[TOKEN_KEY],
+            };
+          },
+        },
+      },
+      context: ({ req }) => {
         return {
-          token: req ? req.headers[TOKEN_KEY] : connection.context[TOKEN_KEY],
+          token: req.headers[TOKEN_KEY],
         };
       },
     }),

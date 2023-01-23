@@ -58,6 +58,7 @@ export class MessagesResolver {
       return roomId === id;
     },
   })
+  @Role([RoleData.USER])
   async roomUpdates(
     @Args('input') { id }: RoomUpdatesInput, // eslint-disable-line
   ): Promise<AsyncIterator<Message>> {
