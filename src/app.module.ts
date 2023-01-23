@@ -13,6 +13,7 @@ import { CommentsModule } from './comments/comments.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { MessagesModule } from './messages/messages.module';
 import { CommonModule } from './common/common.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 const TOKEN_KEY = 'x-jwt' as const;
 @Module({
@@ -32,6 +33,22 @@ const TOKEN_KEY = 'x-jwt' as const;
         AWS_BUCKET_NAME: Joi.string().required(),
       }),
     }),
+    EventEmitterModule.forRoot({
+      // set this to `true` to use wildcards
+      wildcard: false,
+      // the delimiter used to segment namespaces
+      delimiter: '.',
+      // set this to `true` if you want to emit the newListener event
+      newListener: false,
+      // set this to `true` if you want to emit the removeListener event
+      removeListener: false,
+      // the maximum amount of listeners that can be assigned to an event
+      maxListeners: 15,
+      // show event name in memory leak message when more than maximum amount of listeners is assigned
+      verboseMemoryLeak: false,
+      // disable throwing uncaughtException if an error event is emitted and it has no listeners
+      ignoreErrors: false,
+    }),
     // ! GraphQL 설정 모듈
     GraphQLModule.forRoot<ApolloDriverConfig>({
       fieldResolverEnhancers: ['interceptors'],
@@ -41,6 +58,8 @@ const TOKEN_KEY = 'x-jwt' as const;
       subscriptions: {
         'subscriptions-transport-ws': {
           onConnect: (connectionParams: { [TOKEN_KEY]: string }) => {
+            const { [TOKEN_KEY]: token } = connectionParams;
+            if (!token) throw new Error('Missing auth token!');
             return {
               token: connectionParams[TOKEN_KEY],
             };

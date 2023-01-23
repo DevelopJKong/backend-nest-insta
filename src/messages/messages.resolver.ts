@@ -1,3 +1,4 @@
+import { PrismaService } from 'src/prisma/prisma.service';
 import { NEW_MESSAGE, PUB_SUB } from './../common/common.constants';
 import { PubSub } from 'graphql-subscriptions';
 import { ReadMessageInput, ReadMessageOutput } from './dtos/read-message.dto';
@@ -16,7 +17,11 @@ import { RoomUpdatesInput } from './dtos/room-updates.dto';
 
 @Resolver((_of?: void) => Message)
 export class MessagesResolver {
-  constructor(private readonly messageService: MessagesService, @Inject(PUB_SUB) private readonly pubSub: PubSub) {}
+  constructor(
+    private readonly messageService: MessagesService,
+    private readonly prisma: PrismaService,
+    @Inject(PUB_SUB) private readonly pubSub: PubSub,
+  ) {}
 
   @Query(_type => SeeRoomsOutput)
   @Role([RoleData.USER])
@@ -50,12 +55,46 @@ export class MessagesResolver {
 
   @Subscription(_returns => Message, {
     // ! resolve: (payload, variables, context, info)
-    resolve({ roomUpdates }, _variables, _context, _info) {
+    async resolve({ roomUpdates }, { input: { id } }, { user }, _info) {
+      const room = await this.prisma.room.findFirst({
+        where: {
+          id,
+          users: {
+            some: {
+              id: user.id,
+            },
+          },
+        },
+        select: {
+          id: true,
+        },
+      });
+      if (!room) {
+        throw new Error('You shall not see this.');
+      }
       return roomUpdates;
     },
     // ! filter: (payload, variables, context)
-    filter({ roomUpdates: { roomId } }, { input: { id } }, _) {
-      return roomId === id;
+    async filter({ roomUpdates: { roomId } }, { input: { id } }, { user }) {
+      if (roomId === id) {
+        const room = await this.prisma.room.findFirst({
+          where: {
+            id,
+            users: {
+              some: {
+                id: user.id,
+              },
+            },
+          },
+          select: {
+            id: true,
+          },
+        });
+        if (!room) {
+          return false;
+        }
+        return true;
+      }
     },
   })
   @Role([RoleData.USER])
