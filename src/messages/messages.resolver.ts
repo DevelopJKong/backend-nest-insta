@@ -12,6 +12,7 @@ import { AuthUser } from 'src/libs/auth/auth-user.decorator';
 import { RoleData } from '@prisma/client';
 import { Role } from 'src/libs/auth/role.decorator';
 import { Inject } from '@nestjs/common';
+import { RoomUpdatesInput } from './dtos/room-updates.dto';
 
 @Resolver((_of?: void) => Message)
 export class MessagesResolver {
@@ -47,8 +48,19 @@ export class MessagesResolver {
     return this.messageService.readMessage(readMessageInput, authUser.id);
   }
 
-  @Subscription(_returns => Message)
-  async roomUpdates() {
+  @Subscription(_returns => Message, {
+    // ! resolve: (payload, variables, context, info)
+    resolve({ roomUpdates }, _variables, _context, _info) {
+      return roomUpdates;
+    },
+    // ! filter: (payload, variables, context)
+    filter({ roomUpdates: { roomId } }, { input: { id } }, _) {
+      return roomId === id;
+    },
+  })
+  async roomUpdates(
+    @Args('input') { id }: RoomUpdatesInput, // eslint-disable-line
+  ): Promise<AsyncIterator<Message>> {
     return this.pubSub.asyncIterator(NEW_MESSAGE);
   }
   @ResolveField(_type => [User])

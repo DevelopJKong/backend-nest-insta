@@ -7,9 +7,10 @@ import { Room } from './room.entity';
 @InputType('MessageInputType', { isAbstract: true })
 @ObjectType()
 export class Message extends CoreEntity {
-  @Field(_type => String)
+  @Field(_type => String, { nullable: true })
   @IsString()
-  payload: string;
+  @IsOptional()
+  payload?: string;
 
   @Field(_type => Number, { nullable: true })
   @IsOptional()
