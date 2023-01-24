@@ -76,25 +76,26 @@ export class MessagesResolver {
     },
     // ! filter: (payload, variables, context)
     async filter({ roomUpdates: { roomId } }, { input: { id } }, { user }) {
-      if (roomId === id) {
-        const room = await this.prisma.room.findFirst({
-          where: {
-            id,
-            users: {
-              some: {
-                id: user.id,
-              },
+      if (roomId !== id) {
+        return false;
+      }
+      const room = await this.prisma.room.findFirst({
+        where: {
+          id,
+          users: {
+            some: {
+              id: user.id,
             },
           },
-          select: {
-            id: true,
-          },
-        });
-        if (!room) {
-          return false;
-        }
-        return true;
+        },
+        select: {
+          id: true,
+        },
+      });
+      if (!room) {
+        return false;
       }
+      return true;
     },
   })
   @Role([RoleData.USER])
