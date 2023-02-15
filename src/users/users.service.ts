@@ -232,7 +232,6 @@ export class UsersService {
       };
     } catch (error) {
       // ! extraError
-
       return { ok: false, error: new Error(error), message: 'extraError' };
     }
   }

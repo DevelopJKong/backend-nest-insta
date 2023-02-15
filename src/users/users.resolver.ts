@@ -14,9 +14,17 @@ import { Role } from '../libs/auth/role.decorator';
 import { AuthUser } from 'src/libs/auth/auth-user.decorator';
 import { UnFollowUserInput, UnFollowUserOutput } from './dtos/un-follow-user.dto';
 import { SeeFollowingOutput, SeeFollowingInput } from './dtos/see-following.dto';
+import { CoreOutput } from '../common/dtos/output.dto';
 @Resolver((_of?: void) => User)
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
+
+  @Query(_returns => CoreOutput)
+  hi() {
+    return {
+      ok: true,
+    };
+  }
 
   @Mutation(_returns => CreateUserOutput)
   async createUser(@Args('input') createAccountInput: CreateUserInput): Promise<CreateUserOutput> {
