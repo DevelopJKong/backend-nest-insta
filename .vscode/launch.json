@@ -24,7 +24,7 @@
       "runtimeExecutable": "npm",
       "skipFiles": ["<node_internals>/**"],
       "sourceMaps": true,
-      "envFile": "${workspaceFolder}/.env.dev",
+      "envFile": "${workspaceFolder}/.env.development",
       "cwd": "${workspaceRoot}",
       "console": "integratedTerminal"
     }
