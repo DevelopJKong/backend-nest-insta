@@ -1,4 +1,4 @@
-import { CoreOutput } from './../../common/dtos/output.dto';
+import { CoreOutput } from '../../common/dtos/output.dto';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 
 @InputType()

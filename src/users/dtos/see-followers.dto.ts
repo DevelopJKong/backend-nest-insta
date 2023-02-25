@@ -1,5 +1,5 @@
-import { User } from './../entities/user.entity';
-import { CoreOutput } from './../../common/dtos/output.dto';
+import { User } from '../entities/user.entity';
+import { CoreOutput } from '../../common/dtos/output.dto';
 import { InputType, ObjectType, Field, PickType } from '@nestjs/graphql';
 import { IsOptional } from 'class-validator';
 

@@ -1,6 +1,6 @@
 import { Message } from './../entities/message.entity';
 import { Field, InputType, ObjectType, PickType } from '@nestjs/graphql';
-import { CoreOutput } from './../../common/dtos/output.dto';
+import { CoreOutput } from '../../common/dtos/output.dto';
 import { IsOptional } from 'class-validator';
 
 @InputType()

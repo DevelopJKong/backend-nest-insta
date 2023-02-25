@@ -1,5 +1,5 @@
 import { Comment } from '../entities/comment.entity';
-import { CoreOutput } from './../../common/dtos/output.dto';
+import { CoreOutput } from '../../common/dtos/output.dto';
 import { InputType, ObjectType, PickType } from '@nestjs/graphql';
 
 @InputType()

@@ -1,4 +1,4 @@
-import { PaginationOutput } from './../../common/dtos/pagination.dto';
+import { PaginationOutput } from '../../common/dtos/pagination.dto';
 import { InputType, ObjectType, Field } from '@nestjs/graphql';
 import { User } from '../entities/user.entity';
 import { IsOptional } from 'class-validator';
