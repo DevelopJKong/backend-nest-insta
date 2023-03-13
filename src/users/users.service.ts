@@ -20,6 +20,8 @@ import { UnFollowUserInput, UnFollowUserOutput } from './dtos/un-follow-user.dto
 import { User } from './entities/user.entity';
 import { SearchUsersInput, SearchUsersOutput } from './dtos/search-users.dto';
 import { UploadsService } from '../uploads/uploads.service';
+import * as winston from 'winston';
+import * as chalk from 'chalk';
 @Injectable()
 export class UsersService {
   constructor(
@@ -29,10 +31,11 @@ export class UsersService {
     private readonly uploadsService: UploadsService,
   ) {}
 
-  successLogger(service: { name: string }, method: string) {
-    return this.log
-      .logger()
-      .info(`${service.name} => ${this[`${method}`].name}() | Success Message ::: 데이터 호출 성공`);
+  successLogger(service: { name: string }, method: string): winston.Logger {
+    const colorName = chalk.yellow(service.name);
+    const colorMethod = chalk.cyan(`${this[`${method}`].name}()`);
+    const colorSuccess = chalk.green('데이터 호출 성공');
+    return this.log.logger().info(`${colorName} => ${colorMethod} | Success Message ::: ${colorSuccess}`);
   }
 
   async totalFollowing(id: number): Promise<number> {
@@ -122,10 +125,12 @@ export class UsersService {
           followers: true,
         },
       });
-      const totalFollowing = await this.totalFollowing(id);
-      const totalFollowers = await this.totalFollowers(id);
-      const isMe = this.isMe(user, userId);
-      const isFollowing = await this.isFollowing(user, userId);
+      const [totalFollowing, totalFollowers, isFollowing, isMe] = await Promise.all([
+        this.totalFollowing(id), // ! 팔로잉 수
+        this.totalFollowers(id), // ! 팔로워 수
+        this.isFollowing(user, userId), // ! 팔로잉 여부 확인
+        this.isMe(user, userId), // ! 내 계정인지 확인
+      ]);
       // ! 유저가 없을 경우
       if (!user) {
         return {
@@ -452,10 +457,12 @@ export class UsersService {
         },
       });
 
-      const totalFollowing = await this.totalFollowing(userId);
-      const totalFollowers = await this.totalFollowers(userId);
-      const isMe = this.isMe(user, userId);
-      const isFollowing = await this.isFollowing(user, userId);
+      const [totalFollowing, totalFollowers, isFollowing, isMe] = await Promise.all([
+        this.totalFollowing(userId), // ! 팔로잉 수
+        this.totalFollowers(userId), // ! 팔로워 수
+        this.isFollowing(user, userId), // ! 팔로잉 여부 확인
+        this.isMe(user, userId), // ! 내 계정인지 확인
+      ]);
 
       return {
         ok: true,
