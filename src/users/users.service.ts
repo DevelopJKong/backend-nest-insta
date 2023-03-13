@@ -48,7 +48,7 @@ export class UsersService {
         },
       })
       .catch(error => error && 0);
-    if (process.env.NODE_ENV === 'dev') this.successLogger(UsersService, this.totalFollowing.name);
+    this.successLogger(UsersService, this.totalFollowing.name);
     return totalFollowing;
   }
 
@@ -65,7 +65,7 @@ export class UsersService {
         },
       })
       .catch(error => error && 0);
-    if (process.env.NODE_ENV === 'dev') this.successLogger(UsersService, this.totalFollowers.name);
+    this.successLogger(UsersService, this.totalFollowers.name);
     return totalFollowers;
   }
 
@@ -74,7 +74,7 @@ export class UsersService {
       return false;
     }
     // ! 내 계정인지 확인
-    if (process.env.NODE_ENV === 'dev') this.successLogger(UsersService, this.isMe.name);
+    this.successLogger(UsersService, this.isMe.name);
     return id === user.id;
   }
 
@@ -95,7 +95,7 @@ export class UsersService {
         },
       })
       .catch(error => error && false);
-    if (process.env.NODE_ENV === 'dev') this.successLogger(UsersService, this.isFollowing.name);
+    this.successLogger(UsersService, this.isFollowing.name);
     return Boolean(isFollowing);
   }
   async photos(id: number): Promise<Photo[]> {
@@ -106,7 +106,7 @@ export class UsersService {
         },
       })
       .photos();
-    if (process.env.NODE_ENV === 'dev') this.successLogger(UsersService, this.photos.name);
+    this.successLogger(UsersService, this.photos.name);
     return photos as Photo[];
   }
 

@@ -1,7 +1,8 @@
-import { CONFIG_OPTIONS } from '../../common/common.constants';
 import { Inject, Injectable } from '@nestjs/common';
 import * as winston from 'winston';
 import * as winstonDaily from 'winston-daily-rotate-file';
+import * as chalk from 'chalk';
+import { CONFIG_OPTIONS, PROD } from '../../common/common.constants';
 import { LoggerModuleOptions } from './logger.interface';
 
 @Injectable()
@@ -15,7 +16,11 @@ export class LoggerService {
 
     //* log 출력 포맷 정의 함수
     const logFormat = printf(({ level, message, label, timestamp }) => {
-      return `${timestamp} [${label}] ${level}: ${message}`; // 날짜 [시스템이름] 로그레벨 메세지
+      const removedColorText = message.replace(
+        /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
+        '',
+      );
+      return `${timestamp} [${label}] ${level}: ${removedColorText}`; // 날짜 [시스템이름] 로그레벨 메세지
     });
 
     /*
@@ -38,8 +43,8 @@ export class LoggerService {
           level: 'info', // info 레벨
           datePattern: 'YYYY-MM-DD', // 파일 날짜 형식
           dirname: logDir, // 파일 경로
-          filename: `%DATE%.log`, // 파일 이름
-          maxFiles: 30, // 최근 30일치 로그 파일을 남김
+          filename: this.options.nodeEnv !== PROD ? `%DATE%.log` : null, // 파일 이름
+          maxFiles: this.options.nodeEnv !== PROD ? 30 : 0, // 최근 30일치 로그 파일을 남김
           zippedArchive: true,
         }),
         //* error 레벨 로그를 저장할 파일 설정 (info에 자동 포함되지만 일부러 따로 빼서 설정)
@@ -47,8 +52,8 @@ export class LoggerService {
           level: 'error', // error 레벨
           datePattern: 'YYYY-MM-DD',
           dirname: logDir + '/error', // /logs/error 하위에 저장
-          filename: `%DATE%.error.log`, // 에러 로그는 2020-05-28.error.log 형식으로 저장
-          maxFiles: 30,
+          filename: this.options.nodeEnv !== PROD ? `%DATE%.error.log` : null, // 에러 로그는 2020-05-28.error.log 형식으로 저장
+          maxFiles: this.options.nodeEnv !== PROD ? 30 : 0,
           zippedArchive: true,
         }),
       ],
@@ -58,23 +63,21 @@ export class LoggerService {
           level: 'error',
           datePattern: 'YYYY-MM-DD',
           dirname: logDir,
-          filename: `%DATE%.exception.log`,
-          maxFiles: 30,
+          filename: this.options.nodeEnv !== PROD ? `%DATE%.exception.log` : null,
+          maxFiles: this.options.nodeEnv !== PROD ? 30 : 0,
           zippedArchive: true,
         }),
       ],
     });
 
-    if (this.options.nodeEnv !== 'prod') {
-      logger.add(
-        new winston.transports.Console({
-          format: winston.format.combine(
-            winston.format.colorize(), // 색깔 넣어서 출력
-            winston.format.simple(), // `${info.level}: ${info.message} JSON.stringify({ ...rest })` 포맷으로 출력
-          ),
-        }),
-      );
-    }
+    logger.add(
+      new winston.transports.Console({
+        format: winston.format.combine(
+          winston.format.colorize(), // 색깔 넣어서 출력
+          winston.format.simple(), // `${info.level}: ${info.message} JSON.stringify({ ...rest })` 포맷으로 출력
+        ),
+      }),
+    );
     return logger;
   }
 
@@ -85,7 +88,6 @@ export class LoggerService {
    *  @param {string | null} message 에러 메시지
    *  @param {string | null} name  에러 이름
    *  @param {string | null} stack  에러 스택
-   *  @throws {Error}  에러 메시지
    *  @return {string}  최종 메시지
    */
   loggerInfo = (
@@ -101,27 +103,22 @@ export class LoggerService {
         const callerLine = error.stack.split('\n')[2];
         const apiNameArray = callerLine.split(' ');
         const apiName = apiNameArray.filter((item: string) => item !== null && item !== undefined && item !== '')[1];
-
-        // ! 의도하지 않은 extraError 일 경우 에러를 던집니다
-        if (!callerLine.split('(')[1]) throw new Error(error);
-
-        // * 아래코드는 라인 넘버를 보여주기 위한 코드 입니다
         let LineNumber = callerLine.split('(')[1].split('/').slice(-1)[0].slice(0, -1);
 
-        // * window 환경일 경우 아래 코드를 실행합니다
-        if (LineNumber.includes('C:')) LineNumber = `${LineNumber.split('\\').slice(-1)[0]}`;
+        if (LineNumber.includes('C:')) {
+          LineNumber = `${LineNumber.split('\\').slice(-1)[0]}`;
+        }
 
-        const lineNumberText = `Line Number: ${LineNumber} ::: ${apiName} | `;
-        const errorMessage = `${error.message ? `Error Message: ${error.message} | ` : ''}`;
-        const errorName = `${name ? `Error Name: ${name} | ` : ''}`;
-        const errorStack = `${stack ? `Error Stack: ${stack.split('\n')[1].trim()} | ` : ''}`;
-        const customMessage = `${custom ? `Custom Message : ${custom}` : ''}`;
+        const lineNumberText = `${chalk.yellow(LineNumber)} ::: ${chalk.cyan(`${apiName}()`)} | `;
+        const errorMessage = `${error.message ? `Error Message: ${chalk.red(error.message)} | ` : ''}`;
+        const errorName = `${name ? `Error Name: ${chalk.red(name)} | ` : ''}`;
+        const errorStack = `${stack ? `Error Stack: ${chalk.red(stack.split('\n')[1].trim())} | ` : ''}`;
+        const customMessage = `${custom ? `Custom Message : ${chalk.green(custom)}` : ''}`;
 
         return `${lineNumberText}${errorMessage}${errorName}${errorStack}${customMessage}`;
       } catch (error) {
-        // ! 문자열을 자를수 없을 경우 아래 catch문 실행
-        const { stack, name } = error;
-        return `Error Message: extraError | Error Name: ${name} | Error Stack: ${stack} `;
+        const { message, stack, name } = error;
+        return `Error Message: ${message} | Error Name: ${name} | Error Stack: ${stack} `;
       }
     }
   };
