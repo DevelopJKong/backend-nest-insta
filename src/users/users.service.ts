@@ -25,6 +25,7 @@ import * as chalk from 'chalk';
 import { MeOutput } from './dtos/me.dto';
 import { COMMON_ERROR } from '../common/constants/error.constant';
 import { USER_SUCCESS } from '../common/constants/success.constant';
+import { DEV, PROD } from '../common/common.constants';
 @Injectable()
 export class UsersService {
   constructor(
@@ -271,11 +272,10 @@ export class UsersService {
       let filePath: string;
       let avatarFilePath: string;
       if (avatarField) {
-        const { createReadStream, filename } = await avatarField;
-        const userFileFolder = join(fileFolder, './user');
-
         // ! 개발 환경에서 파일 저장
-        if (process.env.NODE_ENV === 'dev') {
+        if (process.env.NODE_ENV === DEV) {
+          const { createReadStream, filename } = await avatarField;
+          const userFileFolder = join(fileFolder, './user');
           if (!fs.existsSync(userFileFolder)) {
             fs.mkdirSync(userFileFolder);
           }
@@ -285,7 +285,7 @@ export class UsersService {
         }
 
         // ! 배포 환경에서 파일 저장
-        if (process.env.NODE_ENV === 'prod') {
+        if (process.env.NODE_ENV === PROD) {
           avatarFilePath = await this.uploadsService.uploadFile(avatarField, userId, 'avatar');
         }
       }

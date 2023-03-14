@@ -4,7 +4,7 @@ import { AppModule } from './app.module';
 import * as graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
 import * as fs from 'fs';
 import * as express from 'express';
-import { BACKEND_URL, PORT, fileFolder } from './common/common.constants';
+import { BACKEND_URL, PORT, fileFolder, DEV } from './common/common.constants';
 import { join } from 'path';
 // ! LoggerInterceptor 사용 시
 import { LoggerInterceptor } from './libs/logger/logger.interceptor';
@@ -13,7 +13,7 @@ import { LoggerService } from './libs/logger/logger.service';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === DEV) {
     if (!fs.existsSync(fileFolder)) fs.mkdirSync(fileFolder);
   }
 

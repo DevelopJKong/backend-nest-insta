@@ -33,7 +33,7 @@ export class MessagesService {
         },
       })
       .users();
-    if (process.env.NODE_ENV === 'dev') this.successLogger(MessagesService, this.users.name);
+    this.successLogger(MessagesService, this.users.name);
     return users as User[];
   }
 
@@ -43,7 +43,7 @@ export class MessagesService {
         roomId,
       },
     });
-    if (process.env.NODE_ENV === 'dev') this.successLogger(MessagesService, this.messages.name);
+    this.successLogger(MessagesService, this.messages.name);
     return messages as Message[];
   }
 
@@ -62,7 +62,7 @@ export class MessagesService {
         },
       },
     });
-    if (process.env.NODE_ENV === 'dev') this.successLogger(MessagesService, this.messages.name);
+    this.successLogger(MessagesService, this.messages.name);
     return count;
   }
 

@@ -17,6 +17,15 @@ import { SeeFeedOutput } from './dtos/see-feed.dto';
 import { Photo } from './entities/photo.entity';
 import { Comment } from 'src/comments/entities/comment.entity';
 import { DeletePhotoInput, DeletePhotoOutput } from './dtos/delete-photo.dto';
+import * as chalk from 'chalk';
+import * as winston from 'winston';
+import { fileFolder, DEV } from '../common/common.constants';
+import { join } from 'path';
+import * as fs from 'fs';
+import { createWriteStream } from 'fs';
+import { COMMON_ERROR } from '../common/constants/error.constant';
+import { BACKEND_URL } from './../common/common.constants';
+import { PHOTO_SUCCESS } from '../common/constants/success.constant';
 
 @Injectable()
 export class PhotosService {
@@ -25,12 +34,12 @@ export class PhotosService {
     private readonly log: LoggerService,
     private readonly uploadsService: UploadsService,
   ) {}
-  successLogger(service: { name: string }, method: string) {
-    return this.log
-      .logger()
-      .info(`${service.name} => ${this[`${method}`].name}() | Success Message ::: 데이터 호출 성공`);
+  successLogger(service: { name: string }, method: string): winston.Logger {
+    const colorName = chalk.yellow(service.name);
+    const colorMethod = chalk.cyan(`${this[`${method}`].name}()`);
+    const colorSuccess = chalk.green('데이터 호출 성공');
+    return this.log.logger().info(`${colorName} => ${colorMethod} | Success Message ::: ${colorSuccess}`);
   }
-
   async user(id: number): Promise<User> {
     // ! 포토 유저 호출 성공
     const user = await this.prisma.user.findUnique({
@@ -38,7 +47,7 @@ export class PhotosService {
         id,
       },
     });
-    if (process.env.NODE_ENV === 'dev') this.successLogger(PhotosService, this.user.name);
+    this.successLogger(PhotosService, this.user.name);
     return user as User;
   }
 
@@ -53,7 +62,7 @@ export class PhotosService {
         },
       },
     });
-    if (process.env.NODE_ENV === 'dev') this.successLogger(PhotosService, this.hashtags.name);
+    this.successLogger(PhotosService, this.hashtags.name);
     return hashtags as Hashtag[];
   }
 
@@ -73,7 +82,7 @@ export class PhotosService {
         take: 5,
         skip: (page - 1) * 5,
       });
-    if (process.env.NODE_ENV === 'dev') this.successLogger(PhotosService, this.photos.name);
+    this.successLogger(PhotosService, this.photos.name);
     return photos as Photo[];
   }
 
@@ -88,7 +97,7 @@ export class PhotosService {
         },
       },
     });
-    if (process.env.NODE_ENV === 'dev') this.successLogger(PhotosService, this.totalPhotos.name);
+    this.successLogger(PhotosService, this.totalPhotos.name);
     return totalPhotos;
   }
 
@@ -100,7 +109,7 @@ export class PhotosService {
         },
       })
       .catch(error => error && 0);
-    if (process.env.NODE_ENV === 'dev') this.successLogger(PhotosService, this.likes.name);
+    this.successLogger(PhotosService, this.likes.name);
     return likes;
   }
 
@@ -112,7 +121,7 @@ export class PhotosService {
         },
       })
       .catch(error => error && 0);
-    if (process.env.NODE_ENV === 'dev') this.successLogger(PhotosService, this.comments.name);
+    this.successLogger(PhotosService, this.comments.name);
     return comments;
   }
 
@@ -127,18 +136,28 @@ export class PhotosService {
     try {
       let hashtagObj = [];
       let filePath: string;
+      let photoFilePath: string;
       if (caption) {
         hashtagObj = processHashtags(caption);
       }
-      if (process.env.NODE_ENV === 'dev') {
-        const { filename } = await photoFile;
-        filePath = filename;
+      if (process.env.NODE_ENV === DEV) {
+        const { createReadStream, filename } = await photoFile;
+        const photoFileFolder = join(fileFolder, './photo');
+        if (!fs.existsSync(photoFileFolder)) {
+          fs.mkdirSync(photoFileFolder);
+        }
+        const devResult = createReadStream().pipe(createWriteStream(join(photoFileFolder, `./${filename}`)));
+        if (!devResult) {
+          return { ok: false, error: new Error('파일 업로드 실패'), message: COMMON_ERROR.extraError.text };
+        }
+        filePath = devResult.path as string;
+        photoFilePath = `${BACKEND_URL}` + join('/files', filePath.split(fileFolder)[1]);
       } else {
-        filePath = await this.uploadsService.uploadFile(photoFile, userId, 'upload');
+        photoFilePath = await this.uploadsService.uploadFile(photoFile, userId, 'upload');
       }
       await this.prisma.photo.create({
         data: {
-          file: filePath,
+          file: photoFilePath,
           caption,
           user: {
             connect: {
@@ -170,14 +189,22 @@ export class PhotosService {
         },
       });
 
+      const [hashtags, user, likes, comments, isMine] = await Promise.all([
+        this.hashtags(photo.id),
+        this.user(photo.userId),
+        this.likes(photo.id),
+        this.comments(photo.id),
+        this.isMine(photo.userId, photo.id),
+      ]);
+
       return {
         photo: {
           ...photo,
-          hashtags: await this.hashtags(photo.id),
-          user: await this.user(photo.userId),
-          likes: await this.likes(photo.id),
-          comments: await this.comments(photo.id),
-          isMine: this.isMine(photo.userId, photo.id),
+          hashtags,
+          user,
+          likes,
+          comments,
+          isMine,
         },
         ok: true,
         message: '사진 보기 성공',
@@ -201,10 +228,13 @@ export class PhotosService {
           message: '해시태그 없음',
         };
       }
+
+      const [photos, totalPhotos] = await Promise.all([this.photos(tag.id, page, userId), this.totalPhotos(tag.id)]);
+
       return {
         ok: true,
-        photos: await this.photos(tag.id, page, userId),
-        totalPhotos: await this.totalPhotos(tag.id),
+        photos,
+        totalPhotos,
         message: '해시태크 보기 성공',
       };
     } catch (error) {
@@ -368,9 +398,13 @@ export class PhotosService {
         orderBy: {
           createdAt: 'desc',
         },
+        include: {
+          user: true,
+        },
       });
       return {
         ok: true,
+        message: PHOTO_SUCCESS.seeFeed.text,
         photos: photos as Photo[],
       };
     } catch (error) {

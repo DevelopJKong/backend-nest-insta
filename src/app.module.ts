@@ -14,6 +14,7 @@ import { UploadsModule } from './uploads/uploads.module';
 import { MessagesModule } from './messages/messages.module';
 import { CommonModule } from './common/common.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { DEV, PROD } from './common/common.constants';
 
 const TOKEN_KEY = 'x-jwt' as const;
 @Module({
@@ -23,10 +24,10 @@ const TOKEN_KEY = 'x-jwt' as const;
     // ! ENV 설정 모듈
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: process.env.NODE_ENV === 'dev' ? '.env.development' : '.env',
-      ignoreEnvFile: process.env.NODE_ENV === 'prod',
+      envFilePath: process.env.NODE_ENV === DEV ? '.env.development' : '.env',
+      ignoreEnvFile: process.env.NODE_ENV === PROD,
       validationSchema: Joi.object({
-        NODE_ENV: Joi.string().valid('dev', 'prod').required(),
+        NODE_ENV: Joi.string().valid(DEV, PROD).required(),
         PRIVATE_KEY: Joi.string().required(),
         AWS_ACCESS_KEY_ID: Joi.string().required(),
         AWS_SECRET_ACCESS_KEY: Joi.string().required(),

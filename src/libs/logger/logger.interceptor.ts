@@ -33,32 +33,34 @@ export class LoggerInterceptor<T> implements NestInterceptor<T, Response<T>> {
 
     return next.handle().pipe(
       map(data => {
-        if (data.ok) {
-          data.error = null;
-          this.log
-            .logger()
-            .info(`${colorSuccessTypeName} => ${colorMethod} | Success Message ::: ${chalk.green(data.message)}`);
-        } else {
-          const { message, stack, name } = data.error;
-          const colorErrorTypeName = chalk.red(`${info.path.typename}`);
-          const colorErrorMethod = chalk.yellow(`${info.path.key}()`);
-          const colorMessage = chalk.red(`${message}`);
-          const colorName = chalk.red(`${name}`);
-          const colorStack = chalk.red(`${stack}`);
-          if (message.includes('Error:')) {
-            // ! server error & query error
+        if (typeof data === 'object' && data.hasOwnProperty('ok')) {
+          if (data.ok) {
+            data.error = null;
             this.log
               .logger()
-              .error(`${colorErrorTypeName} => ${colorErrorMethod} | Name ::: ${name} | Message ::: ${colorMessage}`);
-            data.error = `${info.path.typename} => ${info.path.key}() | Name ::: ${name} | 로그 메시지 참고`;
+              .info(`${colorSuccessTypeName} => ${colorMethod} | Success Message ::: ${chalk.green(data.message)}`);
           } else {
-            // ! client error
-            this.log
-              .logger()
-              .error(
-                `${colorErrorTypeName} => ${colorErrorMethod} | Message ::: ${colorMessage} | Name ::: ${colorName} | Stack ::: ${colorStack}`,
-              );
-            data.error = message;
+            const { message, stack, name } = data.error;
+            const colorErrorTypeName = chalk.red(`${info.path.typename}`);
+            const colorErrorMethod = chalk.yellow(`${info.path.key}()`);
+            const colorMessage = chalk.red(`${message}`);
+            const colorName = chalk.red(`${name}`);
+            const colorStack = chalk.red(`${stack}`);
+            if (message.includes('Error:')) {
+              // ! server error & query error
+              this.log
+                .logger()
+                .error(`${colorErrorTypeName} => ${colorErrorMethod} | Name ::: ${name} | Message ::: ${colorMessage}`);
+              data.error = `${info.path.typename} => ${info.path.key}() | Name ::: ${name} | 로그 메시지 참고`;
+            } else {
+              // ! client error
+              this.log
+                .logger()
+                .error(
+                  `${colorErrorTypeName} => ${colorErrorMethod} | Message ::: ${colorMessage} | Name ::: ${colorName} | Stack ::: ${colorStack}`,
+                );
+              data.error = message;
+            }
           }
         }
         return data;
