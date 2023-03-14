@@ -15,6 +15,7 @@ import { AuthUser } from 'src/libs/auth/auth-user.decorator';
 import { UnFollowUserInput, UnFollowUserOutput } from './dtos/un-follow-user.dto';
 import { SeeFollowingOutput, SeeFollowingInput } from './dtos/see-following.dto';
 import { CoreOutput } from '../common/dtos/output.dto';
+import { MeOutput } from './dtos/me.dto';
 @Resolver((_of?: void) => User)
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
@@ -82,6 +83,12 @@ export class UsersResolver {
   @Role([RoleData.USER])
   async searchUsers(@AuthUser() authUser: User, @Args('input') searchUserInput: SearchUsersInput) {
     return this.usersService.searchUsers(authUser.id, searchUserInput);
+  }
+
+  @Query(_returns => MeOutput)
+  @Role([RoleData.USER])
+  async me(@AuthUser() authUser: User): Promise<MeOutput> {
+    return this.usersService.me(authUser.id);
   }
 
   @ResolveField(_type => Int)

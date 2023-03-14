@@ -22,6 +22,9 @@ import { SearchUsersInput, SearchUsersOutput } from './dtos/search-users.dto';
 import { UploadsService } from '../uploads/uploads.service';
 import * as winston from 'winston';
 import * as chalk from 'chalk';
+import { MeOutput } from './dtos/me.dto';
+import { COMMON_ERROR } from '../common/constants/error.constant';
+import { USER_SUCCESS } from '../common/constants/success.constant';
 @Injectable()
 export class UsersService {
   constructor(
@@ -111,6 +114,25 @@ export class UsersService {
       .photos();
     this.successLogger(UsersService, this.photos.name);
     return photos as Photo[];
+  }
+
+  async me(userId: number): Promise<MeOutput> {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+
+      return {
+        ok: true,
+        message: USER_SUCCESS.me.text,
+        user,
+      };
+    } catch (error) {
+      // ! extraError
+      return { ok: false, error: new Error(error), message: COMMON_ERROR.extraError.text };
+    }
   }
 
   async findById(userId: number, { id }: GetUserInput): Promise<GetUserOutput> {
