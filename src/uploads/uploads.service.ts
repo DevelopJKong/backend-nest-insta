@@ -1,7 +1,8 @@
+require('aws-sdk/lib/maintenance_mode_message').suppress = true;
+import * as AWS from 'aws-sdk';
 import { Inject, Injectable } from '@nestjs/common';
 import { CONFIG_OPTIONS } from 'src/common/common.constants';
 import { UploadsModuleOptions } from './uploads.interface';
-import * as AWS from 'aws-sdk';
 import { FileUpload } from 'src/common/common.interface';
 
 @Injectable()
