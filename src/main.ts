@@ -29,6 +29,8 @@ async function bootstrap() {
   // ! LoggerInterceptor 사용 시
   app.useGlobalInterceptors(new LoggerInterceptor(new LoggerService({ nodeEnv: process.env.NODE_ENV })));
 
+  // ! EventEmitter 설정 시
+  process.setMaxListeners(100);
   const start = () => console.log(`Server Start! ${BACKEND_URL}`);
   await app.listen(PORT, start);
 }

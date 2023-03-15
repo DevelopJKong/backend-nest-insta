@@ -34,4 +34,8 @@ export class Photo extends CoreEntity {
   @IsNumber()
   @IsOptional()
   comments?: number;
+
+  @Field(_type => Boolean, { nullable: true })
+  @IsOptional()
+  isLiked?: Boolean;
 }

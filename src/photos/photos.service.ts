@@ -126,10 +126,31 @@ export class PhotosService {
   }
 
   isMine(id: number, userId: number) {
-    if (userId) {
+    if (!userId) {
       return false;
     }
     return id === userId;
+  }
+
+  async isLiked(id: number, userId: number) {
+    if (!userId) {
+      return false;
+    }
+    const ok = await this.prisma.like.findUnique({
+      where: {
+        photoId_userId: {
+          photoId: id,
+          userId,
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+    if (!ok) {
+      return false;
+    }
+    return true;
   }
 
   async uploadPhoto(userId: number, { photoFile, caption }: UploadPhotoInput): Promise<UploadPhotoOutput> {
@@ -189,12 +210,13 @@ export class PhotosService {
         },
       });
 
-      const [hashtags, user, likes, comments, isMine] = await Promise.all([
+      const [hashtags, user, likes, comments, isMine, isLiked] = await Promise.all([
         this.hashtags(photo.id),
         this.user(photo.userId),
         this.likes(photo.id),
         this.comments(photo.id),
         this.isMine(photo.userId, photo.id),
+        this.isLiked(photo.id, photo.userId),
       ]);
 
       return {
@@ -205,6 +227,7 @@ export class PhotosService {
           likes,
           comments,
           isMine,
+          isLiked,
         },
         ok: true,
         message: '사진 보기 성공',

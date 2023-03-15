@@ -97,6 +97,10 @@ export class PhotosResolver {
   isMine(@Parent() photo: Photo, @AuthUser() authUser: User): boolean {
     return this.photosService.isMine(photo.id, authUser.id);
   }
+  @ResolveField(_type => Boolean)
+  isLiked(@Parent() photo: Photo, @AuthUser() authUser: User): boolean {
+    return this.photosService.isMine(photo.id, authUser.id);
+  }
 }
 
 @Resolver(_of => Hashtag)
