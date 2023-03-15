@@ -98,8 +98,8 @@ export class PhotosResolver {
     return this.photosService.isMine(photo.id, authUser.id);
   }
   @ResolveField(_type => Boolean)
-  isLiked(@Parent() photo: Photo, @AuthUser() authUser: User): boolean {
-    return this.photosService.isMine(photo.id, authUser.id);
+  async isLiked(@Parent() photo: Photo, @AuthUser() authUser: User): Promise<boolean> {
+    return this.photosService.isLiked(photo.id, authUser.id);
   }
 }
 

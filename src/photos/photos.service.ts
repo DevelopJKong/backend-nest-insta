@@ -132,7 +132,7 @@ export class PhotosService {
     return id === userId;
   }
 
-  async isLiked(id: number, userId: number) {
+  async isLiked(id: number, userId: number): Promise<boolean> {
     if (!userId) {
       return false;
     }
