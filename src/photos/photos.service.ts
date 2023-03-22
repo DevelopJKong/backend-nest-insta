@@ -113,14 +113,27 @@ export class PhotosService {
     return likes;
   }
 
-  async comments(id: number): Promise<number> {
-    const comments = await this.prisma.comment
+  async commentNumber(id: number): Promise<number> {
+    const commentNumber = await this.prisma.comment
       .count({
         where: {
           photoId: id,
         },
       })
       .catch(error => error && 0);
+    this.successLogger(PhotosService, this.commentNumber.name);
+    return commentNumber;
+  }
+
+  async comments(id: number, _page?: number): Promise<Comment[]> {
+    const comments = (await this.prisma.comment
+      .findMany({
+        where: { photoId: id },
+        include: {
+          user: true,
+        },
+      })
+      .catch(error => error && [])) as Comment[];
     this.successLogger(PhotosService, this.comments.name);
     return comments;
   }
@@ -210,13 +223,14 @@ export class PhotosService {
         },
       });
 
-      const [hashtags, user, likes, comments, isMine, isLiked] = await Promise.all([
+      const [hashtags, user, likes, commentNumber, isMine, isLiked, comments] = await Promise.all([
         this.hashtags(photo.id),
         this.user(photo.userId),
         this.likes(photo.id),
-        this.comments(photo.id),
+        this.commentNumber(photo.id),
         this.isMine(photo.userId, photo.id),
         this.isLiked(photo.id, photo.userId),
+        this.comments(photo.id),
       ]);
 
       return {
@@ -225,9 +239,10 @@ export class PhotosService {
           hashtags,
           user,
           likes,
-          comments,
+          commentNumber,
           isMine,
           isLiked,
+          comments: comments as Comment[],
         },
         ok: true,
         message: '사진 보기 성공',

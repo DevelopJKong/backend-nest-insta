@@ -15,6 +15,7 @@ import { Photo } from './entities/photo.entity';
 import { Hashtag } from 'src/photos/entities/hashtag.entity';
 import { SeeHashtagInput, SeeHashtagOutput } from './dtos/see-hashtags.dto';
 import { SeePhotoCommentsOutput, SeePhotoCommentsInput } from './dtos/see-photo-comments.dto';
+import { Comment } from 'src/comments/entities/comment.entity';
 
 @Resolver(_of => Photo)
 export class PhotosResolver {
@@ -90,8 +91,8 @@ export class PhotosResolver {
     return this.photosService.likes(photo.id);
   }
   @ResolveField(_type => Number)
-  async comments(@Parent() photo: Photo): Promise<number> {
-    return this.photosService.comments(photo.id);
+  async commentNumber(@Parent() photo: Photo): Promise<number> {
+    return this.photosService.commentNumber(photo.id);
   }
   @ResolveField(_type => Boolean)
   isMine(@Parent() photo: Photo, @AuthUser() authUser: User): boolean {
@@ -100,6 +101,10 @@ export class PhotosResolver {
   @ResolveField(_type => Boolean)
   async isLiked(@Parent() photo: Photo, @AuthUser() authUser: User): Promise<boolean> {
     return this.photosService.isLiked(photo.id, authUser.id);
+  }
+  @ResolveField(_type => [Comment])
+  async comments(@Parent() photo: Photo): Promise<Comment[]> {
+    return this.photosService.comments(photo.id);
   }
 }
 
