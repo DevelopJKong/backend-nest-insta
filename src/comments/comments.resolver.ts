@@ -42,6 +42,6 @@ export class CommentsResolver {
 
   @ResolveField(_type => Boolean)
   isMine(@Parent() comment: Comment, @AuthUser() authUser: User): boolean {
-    return this.commentsService.isMine(comment.id, authUser.id);
+    return this.commentsService.isMine(comment.user.id, authUser.id);
   }
 }
