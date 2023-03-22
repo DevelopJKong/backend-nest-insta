@@ -52,6 +52,7 @@ export class CommentsService {
 
       return {
         ok: true,
+        id: photoId,
         message: '코멘트 생성 성공',
       };
     } catch (error) {
