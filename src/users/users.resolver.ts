@@ -24,6 +24,7 @@ export class UsersResolver {
   hi() {
     return {
       ok: true,
+      message: 'Query Check Success',
     };
   }
 
