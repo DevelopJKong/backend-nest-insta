@@ -26,6 +26,7 @@ import { MeOutput } from './dtos/me.dto';
 import { COMMON_ERROR } from '../common/constants/error.constant';
 import { USER_SUCCESS } from '../common/constants/success.constant';
 import { DEV, PROD } from '../common/common.constants';
+import { SeeProfileOutput, SeeProfileInput } from './dtos/see-profile.dto';
 @Injectable()
 export class UsersService {
   constructor(
@@ -93,10 +94,10 @@ export class UsersService {
     const isFollowing = await this.prisma.user
       .count({
         where: {
-          username: user.username,
+          id,
           following: {
             some: {
-              id,
+              username: user.username,
             },
           },
         },
@@ -135,6 +136,43 @@ export class UsersService {
       return { ok: false, error: new Error(error), message: COMMON_ERROR.extraError.text };
     }
   }
+  async seeProfile(userId: number, { username }: SeeProfileInput): Promise<SeeProfileOutput> {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          username,
+        },
+        include: {
+          photos: true,
+        },
+      });
+      if (!user) {
+        return {
+          ok: false,
+          error: new Error('유저를 찾을 수 없습니다.'),
+        };
+      }
+      const [totalFollowing, totalFollowers, isFollowing, isMe] = await Promise.all([
+        this.totalFollowing(user.id), // ! 팔로잉 수
+        this.totalFollowers(user.id), // ! 팔로워 수
+        this.isFollowing(user, userId), // ! 팔로잉 여부 확인
+        this.isMe(user, userId), // ! 내 계정인지 확인
+      ]);
+      return {
+        ok: true,
+        user: {
+          ...user,
+          totalFollowing,
+          totalFollowers,
+          isFollowing,
+          isMe,
+        },
+      };
+    } catch (error) {
+      // ! extraError
+      return { ok: false, error: new Error(error), message: COMMON_ERROR.extraError.text };
+    }
+  }
 
   async findById(userId: number, { id }: GetUserInput): Promise<GetUserOutput> {
     try {
@@ -148,10 +186,9 @@ export class UsersService {
           followers: true,
         },
       });
-      const [totalFollowing, totalFollowers, isFollowing, isMe] = await Promise.all([
+      const [totalFollowing, totalFollowers, isMe] = await Promise.all([
         this.totalFollowing(id), // ! 팔로잉 수
         this.totalFollowers(id), // ! 팔로워 수
-        this.isFollowing(user, userId), // ! 팔로잉 여부 확인
         this.isMe(user, userId), // ! 내 계정인지 확인
       ]);
       // ! 유저가 없을 경우
@@ -164,12 +201,13 @@ export class UsersService {
       // * 유저가 있을 경우
       return {
         ok: true,
-        user,
+        user: {
+          ...user,
+          totalFollowing,
+          totalFollowers,
+          isMe,
+        },
         message: '유저 찾기',
-        totalFollowing,
-        totalFollowers,
-        isMe,
-        isFollowing,
       };
     } catch (error) {
       // ! extraError
@@ -329,8 +367,8 @@ export class UsersService {
 
   async followUser(userId: number, { username }: FollowUserInput): Promise<FollowUserOutput> {
     try {
-      const ok = await this.prisma.user.findUnique({ where: { username } });
-      if (!ok) {
+      const user = await this.prisma.user.findUnique({ where: { username } });
+      if (!user) {
         // ! 유저가 없을 경우
         return {
           ok: false,
@@ -468,31 +506,9 @@ export class UsersService {
         },
       });
 
-      // ! 데이터베이스에서 유저 찾기
-      const user = await this.prisma.user.findUnique({
-        where: {
-          id: userId,
-        },
-        include: {
-          following: true,
-          followers: true,
-        },
-      });
-
-      const [totalFollowing, totalFollowers, isFollowing, isMe] = await Promise.all([
-        this.totalFollowing(userId), // ! 팔로잉 수
-        this.totalFollowers(userId), // ! 팔로워 수
-        this.isFollowing(user, userId), // ! 팔로잉 여부 확인
-        this.isMe(user, userId), // ! 내 계정인지 확인
-      ]);
-
       return {
         ok: true,
         users,
-        totalFollowing,
-        totalFollowers,
-        isMe,
-        isFollowing,
       };
     } catch (error) {
       // ! extraError

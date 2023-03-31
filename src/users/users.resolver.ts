@@ -16,6 +16,7 @@ import { UnFollowUserInput, UnFollowUserOutput } from './dtos/un-follow-user.dto
 import { SeeFollowingOutput, SeeFollowingInput } from './dtos/see-following.dto';
 import { CoreOutput } from '../common/dtos/output.dto';
 import { MeOutput } from './dtos/me.dto';
+import { SeeProfileInput, SeeProfileOutput } from './dtos/see-profile.dto';
 @Resolver((_of?: void) => User)
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
@@ -40,8 +41,17 @@ export class UsersResolver {
 
   @Query(_returns => GetUserOutput)
   @Role([RoleData.USER])
-  async getUser(@AuthUser() authUser: User, @Args('input') { id }: GetUserInput): Promise<GetUserOutput> {
-    return this.usersService.findById(authUser.id, { id });
+  async getUser(@AuthUser() authUser: User, @Args('input') getUserInput: GetUserInput): Promise<GetUserOutput> {
+    return this.usersService.findById(authUser.id, getUserInput);
+  }
+
+  @Query(_returns => SeeProfileOutput)
+  @Role([RoleData.USER])
+  async seeProfile(
+    @AuthUser() authUser: User,
+    @Args('input') seeProfileInput: SeeProfileInput,
+  ): Promise<SeeProfileOutput> {
+    return this.usersService.seeProfile(authUser.id, seeProfileInput);
   }
 
   @Mutation(_returns => EditProfileOutput)
