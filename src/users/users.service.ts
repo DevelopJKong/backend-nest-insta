@@ -215,8 +215,10 @@ export class UsersService {
     }
   }
 
-  async createUser({ firstName, lastName, email, username, password }: CreateUserInput): Promise<CreateUserOutput> {
+  async createUser({ firstName, lastName, email, password }: CreateUserInput): Promise<CreateUserOutput> {
     try {
+      const username = email.split('@')[0];
+
       // ! 이미 데이터베이스에 닉네임과 이메일이 존재하는지 확인
       const exists = await this.prisma.user.findFirst({
         where: {
@@ -224,9 +226,9 @@ export class UsersService {
             {
               username,
             },
-            // {
-            //   email,
-            // },
+            {
+              email,
+            },
           ],
         },
       });
