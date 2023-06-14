@@ -413,7 +413,7 @@ export class PhotosService {
     }
   }
 
-  async seeFeed(userId: number): Promise<SeeFeedOutput> {
+  async seeFeed(userId: number, page: number): Promise<SeeFeedOutput> {
     const firstCondition = {
       user: {
         followers: {
@@ -430,6 +430,8 @@ export class PhotosService {
 
     try {
       const photos = await this.prisma.photo.findMany({
+        take: 2,
+        skip: (page - 1) * 2,
         where: {
           OR: [firstCondition, secondCondition],
         },

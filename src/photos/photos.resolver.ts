@@ -1,5 +1,5 @@
 import { DeletePhotoInput, DeletePhotoOutput } from './dtos/delete-photo.dto';
-import { SeeFeedOutput } from './dtos/see-feed.dto';
+import { SeeFeedInput, SeeFeedOutput } from './dtos/see-feed.dto';
 import { SeeLikesOutput, SeeLikesInput } from './dtos/see-likes.dto';
 import { SearchPhotosInput, SearchPhotosOutput } from './dtos/search-photos.dto';
 import { ToggleLikeOutput, ToggleLikeInput } from './dtos/toggle-like.dto';
@@ -41,8 +41,8 @@ export class PhotosResolver {
 
   @Query(_return => SeeFeedOutput)
   @Role([RoleData.USER])
-  async seeFeed(@AuthUser() authUser: User): Promise<SeeFeedOutput> {
-    return this.photosService.seeFeed(authUser.id);
+  async seeFeed(@AuthUser() authUser: User, @Args('input') { page }: SeeFeedInput): Promise<SeeFeedOutput> {
+    return this.photosService.seeFeed(authUser.id, page);
   }
 
   @Query(_return => SeePhotoCommentsOutput)
