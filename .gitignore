@@ -41,6 +41,7 @@ lerna-debug.log*
 
 # package-lock.json
 package-lock.json
+yarn.lock
 
 # sql
 main.session.sql
