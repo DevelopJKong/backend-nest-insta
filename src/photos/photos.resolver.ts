@@ -1,20 +1,20 @@
-import { DeletePhotoInput, DeletePhotoOutput } from './dtos/delete-photo.dto';
-import { SeeFeedInput, SeeFeedOutput } from './dtos/see-feed.dto';
-import { SeeLikesOutput, SeeLikesInput } from './dtos/see-likes.dto';
-import { SearchPhotosInput, SearchPhotosOutput } from './dtos/search-photos.dto';
-import { ToggleLikeOutput, ToggleLikeInput } from './dtos/toggle-like.dto';
-import { SeePhotoOutput, SeePhotoInput } from './dtos/see-photo.dto';
+import { DeletePhotoInput, DeletePhotoOutput } from './dto/delete-photo.dto';
+import { SeeFeedInput, SeeFeedOutput } from './dto/see-feed.dto';
+import { SeeLikesOutput, SeeLikesInput } from './dto/see-likes.dto';
+import { SearchPhotosInput, SearchPhotosOutput } from './dto/search-photos.dto';
+import { ToggleLikeOutput, ToggleLikeInput } from './dto/toggle-like.dto';
+import { SeePhotoOutput, SeePhotoInput } from './dto/see-photo.dto';
 import { RoleData } from '@prisma/client';
 import { User } from './../users/entities/user.entity';
 import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { UploadPhotoOutput, UploadPhotoInput } from './dtos/upload-photo.dto';
+import { UploadPhotoOutput, UploadPhotoInput } from './dto/upload-photo.dto';
 import { AuthUser } from 'src/libs/auth/auth-user.decorator';
 import { PhotosService } from './photos.service';
 import { Role } from 'src/libs/auth/role.decorator';
 import { Photo } from './entities/photo.entity';
 import { Hashtag } from 'src/photos/entities/hashtag.entity';
-import { SeeHashtagInput, SeeHashtagOutput } from './dtos/see-hashtags.dto';
-import { SeePhotoCommentsOutput, SeePhotoCommentsInput } from './dtos/see-photo-comments.dto';
+import { SeeHashtagInput, SeeHashtagOutput } from './dto/see-hashtags.dto';
+import { SeePhotoCommentsOutput, SeePhotoCommentsInput } from './dto/see-photo-comments.dto';
 import { Comment } from 'src/comments/entities/comment.entity';
 
 @Resolver(_of => Photo)

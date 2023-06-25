@@ -1,22 +1,22 @@
 import { Photo } from './../photos/entities/photo.entity';
-import { SearchUsersInput, SearchUsersOutput } from './dtos/search-users.dto';
-import { SeeFollowersOutput, SeeFollowersInput } from './dtos/see-followers.dto';
-import { FollowUserInput, FollowUserOutput } from './dtos/follow-user.dto';
+import { SearchUsersInput, SearchUsersOutput } from './dto/search-users.dto';
+import { SeeFollowersOutput, SeeFollowersInput } from './dto/see-followers.dto';
+import { FollowUserInput, FollowUserOutput } from './dto/follow-user.dto';
 import { RoleData } from '@prisma/client';
-import { GetUserInput, GetUserOutput } from './dtos/get-user.dto';
+import { GetUserInput, GetUserOutput } from './dto/get-user.dto';
 import { Resolver, Args, Query, Mutation, ResolveField, Int, Parent } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
-import { CreateUserInput, CreateUserOutput } from './dtos/create-user.dto';
-import { LoginInput, LoginOutput } from './dtos/login.dto';
-import { EditProfileInput, EditProfileOutput } from './dtos/edit-profile.dto';
+import { CreateUserInput, CreateUserOutput } from './dto/create-user.dto';
+import { LoginInput, LoginOutput } from './dto/login.dto';
+import { EditProfileInput, EditProfileOutput } from './dto/edit-profile.dto';
 import { Role } from '../libs/auth/role.decorator';
 import { AuthUser } from 'src/libs/auth/auth-user.decorator';
-import { UnFollowUserInput, UnFollowUserOutput } from './dtos/un-follow-user.dto';
-import { SeeFollowingOutput, SeeFollowingInput } from './dtos/see-following.dto';
-import { CoreOutput } from '../common/dtos/output.dto';
-import { MeOutput } from './dtos/me.dto';
-import { SeeProfileInput, SeeProfileOutput } from './dtos/see-profile.dto';
+import { UnFollowUserInput, UnFollowUserOutput } from './dto/un-follow-user.dto';
+import { SeeFollowingOutput, SeeFollowingInput } from './dto/see-following.dto';
+import { CoreOutput } from '../common/dto/output.dto';
+import { MeOutput } from './dto/me.dto';
+import { SeeProfileInput, SeeProfileOutput } from './dto/see-profile.dto';
 @Resolver((_of?: void) => User)
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}

@@ -1,11 +1,11 @@
 import { PrismaService } from 'src/prisma/prisma.service';
 import { NEW_MESSAGE, PUB_SUB } from './../common/common.constants';
 import { PubSub } from 'graphql-subscriptions';
-import { ReadMessageInput, ReadMessageOutput } from './dtos/read-message.dto';
+import { ReadMessageInput, ReadMessageOutput } from './dto/read-message.dto';
 import { Message } from './entities/message.entity';
-import { SeeRoomOutput, SeeRoomInput } from './dtos/see-room.dto';
-import { SendMessageOutput, SendMessageInput } from './dtos/send-message.dto';
-import { SeeRoomsOutput } from './dtos/see-rooms.dto';
+import { SeeRoomOutput, SeeRoomInput } from './dto/see-room.dto';
+import { SendMessageOutput, SendMessageInput } from './dto/send-message.dto';
+import { SeeRoomsOutput } from './dto/see-rooms.dto';
 import { User } from './../users/entities/user.entity';
 import { Args, Mutation, Parent, Query, ResolveField, Resolver, Subscription } from '@nestjs/graphql';
 import { MessagesService } from './messages.service';
@@ -13,7 +13,7 @@ import { AuthUser } from 'src/libs/auth/auth-user.decorator';
 import { RoleData } from '@prisma/client';
 import { Role } from 'src/libs/auth/role.decorator';
 import { Inject } from '@nestjs/common';
-import { RoomUpdatesInput } from './dtos/room-updates.dto';
+import { RoomUpdatesInput } from './dto/room-updates.dto';
 
 @Resolver((_of?: void) => Message)
 export class MessagesResolver {

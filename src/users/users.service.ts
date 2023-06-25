@@ -1,32 +1,32 @@
 import { Photo } from 'src/photos/entities/photo.entity';
-import { SeeFollowingOutput, SeeFollowingInput } from './dtos/see-following.dto';
-import { SeeFollowersInput, SeeFollowersOutput } from './dtos/see-followers.dto';
-import { FollowUserInput, FollowUserOutput } from './dtos/follow-user.dto';
+import { SeeFollowingOutput, SeeFollowingInput } from './dto/see-following.dto';
+import { SeeFollowersInput, SeeFollowersOutput } from './dto/see-followers.dto';
+import { FollowUserInput, FollowUserOutput } from './dto/follow-user.dto';
 import { BACKEND_URL } from './../common/common.constants';
 import { join } from 'path';
 import { createWriteStream } from 'fs';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { GetUserInput, GetUserOutput } from './dtos/get-user.dto';
-import { CreateUserInput, CreateUserOutput } from './dtos/create-user.dto';
+import { GetUserInput, GetUserOutput } from './dto/get-user.dto';
+import { CreateUserInput, CreateUserOutput } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { LoggerService } from '../libs/logger/logger.service';
-import { LoginInput, LoginOutput } from './dtos/login.dto';
+import { LoginInput, LoginOutput } from './dto/login.dto';
 import { JwtService } from '../libs/jwt/jwt.service';
-import { EditProfileInput, EditProfileOutput } from './dtos/edit-profile.dto';
+import { EditProfileInput, EditProfileOutput } from './dto/edit-profile.dto';
 import * as fs from 'fs';
 import { fileFolder } from 'src/common/common.constants';
-import { UnFollowUserInput, UnFollowUserOutput } from './dtos/un-follow-user.dto';
+import { UnFollowUserInput, UnFollowUserOutput } from './dto/un-follow-user.dto';
 import { User } from './entities/user.entity';
-import { SearchUsersInput, SearchUsersOutput } from './dtos/search-users.dto';
+import { SearchUsersInput, SearchUsersOutput } from './dto/search-users.dto';
 import { UploadsService } from '../uploads/uploads.service';
 import * as winston from 'winston';
 import * as chalk from 'chalk';
-import { MeOutput } from './dtos/me.dto';
+import { MeOutput } from './dto/me.dto';
 import { COMMON_ERROR } from '../common/constants/error.constant';
 import { USER_SUCCESS } from '../common/constants/success.constant';
 import { DEV, PROD } from '../common/common.constants';
-import { SeeProfileOutput, SeeProfileInput } from './dtos/see-profile.dto';
+import { SeeProfileOutput, SeeProfileInput } from './dto/see-profile.dto';
 @Injectable()
 export class UsersService {
   constructor(

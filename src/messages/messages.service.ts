@@ -3,13 +3,13 @@ import { NEW_MESSAGE, PUB_SUB } from './../common/common.constants';
 import { LoggerService } from './../libs/logger/logger.service';
 import { Message } from './entities/message.entity';
 import { User } from './../users/entities/user.entity';
-import { SendMessageInput } from './dtos/send-message.dto';
+import { SendMessageInput } from './dto/send-message.dto';
 import { Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { SeeRoomsOutput } from './dtos/see-rooms.dto';
+import { SeeRoomsOutput } from './dto/see-rooms.dto';
 import { Room } from './entities/room.entity';
-import { SeeRoomInput, SeeRoomOutput } from './dtos/see-room.dto';
-import { ReadMessageInput } from './dtos/read-message.dto';
+import { SeeRoomInput, SeeRoomOutput } from './dto/see-room.dto';
+import { ReadMessageInput } from './dto/read-message.dto';
 
 @Injectable()
 export class MessagesService {

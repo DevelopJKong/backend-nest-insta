@@ -1,7 +1,7 @@
-import { EditCommentInput } from './dtos/edit-comment.dto';
-import { DeleteCommentInput, DeleteCommentOutput } from './dtos/delete-comment.dto';
+import { EditCommentInput } from './dto/edit-comment.dto';
+import { DeleteCommentInput, DeleteCommentOutput } from './dto/delete-comment.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateCommentInput, CreateCommentOutput } from './dtos/create-comment.dto';
+import { CreateCommentInput, CreateCommentOutput } from './dto/create-comment.dto';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()

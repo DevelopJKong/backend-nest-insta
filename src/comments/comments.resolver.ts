@@ -1,8 +1,8 @@
-import { EditCommentInput, EditCommentOutput } from './dtos/edit-comment.dto';
-import { DeleteCommentOutput, DeleteCommentInput } from './dtos/delete-comment.dto';
+import { EditCommentInput, EditCommentOutput } from './dto/edit-comment.dto';
+import { DeleteCommentOutput, DeleteCommentInput } from './dto/delete-comment.dto';
 import { User } from 'src/users/entities/user.entity';
 import { RoleData } from '@prisma/client';
-import { CreateCommentInput, CreateCommentOutput } from './dtos/create-comment.dto';
+import { CreateCommentInput, CreateCommentOutput } from './dto/create-comment.dto';
 import { Args, Mutation, Parent, ResolveField, Resolver } from '@nestjs/graphql';
 import { CommentsService } from './comments.service';
 import { AuthUser } from 'src/libs/auth/auth-user.decorator';
