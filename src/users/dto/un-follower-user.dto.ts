@@ -3,7 +3,7 @@ import { CoreOutput } from 'src/common/dto/output.dto';
 import { User } from '../entities/user.entity';
 
 @InputType()
-export class UnFollowUserInput extends PickType(User, ['username']) {}
+export class UnFollowerUserInput extends PickType(User, ['username']) {}
 
 @ObjectType()
-export class UnFollowUserOutput extends CoreOutput {}
+export class UnFollowerUserOutput extends CoreOutput {}

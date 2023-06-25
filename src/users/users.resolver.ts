@@ -1,7 +1,7 @@
 import { Photo } from './../photos/entities/photo.entity';
 import { SearchUsersInput, SearchUsersOutput } from './dto/search-users.dto';
 import { SeeFollowersOutput, SeeFollowersInput } from './dto/see-followers.dto';
-import { FollowUserInput, FollowUserOutput } from './dto/follow-user.dto';
+import { FollowerUserInput, FollowerUserOutput } from './dto/follower-user.dto';
 import { RoleData } from '@prisma/client';
 import { GetUserInput, GetUserOutput } from './dto/get-user.dto';
 import { Resolver, Args, Query, Mutation, ResolveField, Int, Parent } from '@nestjs/graphql';
@@ -12,7 +12,7 @@ import { LoginInput, LoginOutput } from './dto/login.dto';
 import { EditProfileInput, EditProfileOutput } from './dto/edit-profile.dto';
 import { Role } from '../libs/auth/role.decorator';
 import { AuthUser } from 'src/libs/auth/auth-user.decorator';
-import { UnFollowUserInput, UnFollowUserOutput } from './dto/un-follow-user.dto';
+import { UnFollowerUserInput, UnFollowerUserOutput } from './dto/un-follower-user.dto';
 import { SeeFollowingOutput, SeeFollowingInput } from './dto/see-following.dto';
 import { CoreOutput } from '../common/dto/output.dto';
 import { MeOutput } from './dto/me.dto';
@@ -63,19 +63,19 @@ export class UsersResolver {
     return this.usersService.editProfile(authUser.id, editProfileInput);
   }
 
-  @Mutation(_returns => FollowUserOutput)
+  @Mutation(_returns => FollowerUserOutput)
   @Role([RoleData.USER])
-  async followUser(
+  async followerUser(
     @AuthUser() authUser: User,
-    @Args('input') followUserInput: FollowUserInput,
-  ): Promise<FollowUserOutput> {
-    return this.usersService.followUser(authUser.id, followUserInput);
+    @Args('input') followerUserInput: FollowerUserInput,
+  ): Promise<FollowerUserOutput> {
+    return this.usersService.followerUser(authUser.id, followerUserInput);
   }
 
-  @Mutation(_returns => UnFollowUserOutput)
+  @Mutation(_returns => UnFollowerUserOutput)
   @Role([RoleData.USER])
-  async unFollowUser(@AuthUser() authUser: User, @Args('input') unFollowUserInput: UnFollowUserInput) {
-    return this.usersService.unFollowUser(authUser.id, unFollowUserInput);
+  async unFollowerUser(@AuthUser() authUser: User, @Args('input') unFollowerUserInput: UnFollowerUserInput) {
+    return this.usersService.unFollowerUser(authUser.id, unFollowerUserInput);
   }
 
   @Query(_returns => SeeFollowersOutput)

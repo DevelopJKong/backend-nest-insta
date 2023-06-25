@@ -72,6 +72,11 @@ export class User extends CoreEntity {
   @Field(_type => Boolean, { nullable: true })
   @IsBoolean()
   @IsOptional()
+  isFollowingCheck?: boolean;
+
+  @Field(_type => Boolean, { nullable: true })
+  @IsBoolean()
+  @IsOptional()
   isMe?: boolean;
 
   @Field(_type => Number, { nullable: true })

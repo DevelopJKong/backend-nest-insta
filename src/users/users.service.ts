@@ -1,7 +1,7 @@
 import { Photo } from 'src/photos/entities/photo.entity';
 import { SeeFollowingOutput, SeeFollowingInput } from './dto/see-following.dto';
 import { SeeFollowersInput, SeeFollowersOutput } from './dto/see-followers.dto';
-import { FollowUserInput, FollowUserOutput } from './dto/follow-user.dto';
+import { FollowerUserInput, FollowerUserOutput } from './dto/follower-user.dto';
 import { BACKEND_URL } from './../common/common.constants';
 import { join } from 'path';
 import { createWriteStream } from 'fs';
@@ -16,12 +16,13 @@ import { JwtService } from '../libs/jwt/jwt.service';
 import { EditProfileInput, EditProfileOutput } from './dto/edit-profile.dto';
 import * as fs from 'fs';
 import { fileFolder } from 'src/common/common.constants';
-import { UnFollowUserInput, UnFollowUserOutput } from './dto/un-follow-user.dto';
+import { UnFollowerUserInput, UnFollowerUserOutput } from './dto/un-follower-user.dto';
 import { User } from './entities/user.entity';
 import { SearchUsersInput, SearchUsersOutput } from './dto/search-users.dto';
 import { UploadsService } from '../uploads/uploads.service';
 import * as winston from 'winston';
 import * as chalk from 'chalk';
+import * as _ from 'lodash';
 import { MeOutput } from './dto/me.dto';
 import { COMMON_ERROR } from '../common/constants/error.constant';
 import { USER_SUCCESS } from '../common/constants/success.constant';
@@ -36,6 +37,13 @@ export class UsersService {
     private readonly uploadsService: UploadsService,
   ) {}
 
+  /**
+   * @title 성공시 나오는 로거
+   * @description 성공시 나오는 로거 함수 입니다.
+   * @param {{name:string}} service 서비스 이름
+   * @param {string} method 메소드 이름
+   * @returns {winston.Logger} 로거
+   */
   successLogger(service: { name: string }, method: string): winston.Logger {
     const colorName = chalk.yellow(service.name);
     const colorMethod = chalk.cyan(`${this[`${method}`].name}()`);
@@ -95,7 +103,7 @@ export class UsersService {
       .count({
         where: {
           id,
-          following: {
+          followers: {
             some: {
               username: user.username,
             },
@@ -138,35 +146,43 @@ export class UsersService {
   }
   async seeProfile(userId: number, { username }: SeeProfileInput): Promise<SeeProfileOutput> {
     try {
-      const user = await this.prisma.user.findUnique({
-        where: {
-          username,
-        },
-        include: {
-          photos: true,
-        },
-      });
+      const user = await this.prisma.user
+        .findUnique({
+          where: {
+            username,
+          },
+          include: {
+            photos: true,
+          },
+        })
+        .then(async user => {
+          const [totalFollowing, totalFollowers, isFollowing, isMe] = await Promise.all([
+            this.totalFollowing(user.id), // ! 팔로잉 수
+            this.totalFollowers(user.id), // ! 팔로워 수
+            this.isFollowing(user, userId), // ! 팔로잉 여부 확인
+            this.isMe(user, userId), // ! 내 계정인지 확인
+          ]);
+          const userResult = {
+            ...user,
+            totalFollowing,
+            totalFollowers,
+            isFollowing,
+            isMe,
+          };
+          return userResult;
+        });
+
       if (!user) {
         return {
           ok: false,
           error: new Error('유저를 찾을 수 없습니다.'),
         };
       }
-      const [totalFollowing, totalFollowers, isFollowing, isMe] = await Promise.all([
-        this.totalFollowing(user.id), // ! 팔로잉 수
-        this.totalFollowers(user.id), // ! 팔로워 수
-        this.isFollowing(user, userId), // ! 팔로잉 여부 확인
-        this.isMe(user, userId), // ! 내 계정인지 확인
-      ]);
+
       return {
         ok: true,
-        user: {
-          ...user,
-          totalFollowing,
-          totalFollowers,
-          isFollowing,
-          isMe,
-        },
+        message: USER_SUCCESS.seeProfile.text,
+        user,
       };
     } catch (error) {
       // ! extraError
@@ -177,20 +193,34 @@ export class UsersService {
   async findById(userId: number, { id }: GetUserInput): Promise<GetUserOutput> {
     try {
       // ! 데이터베이스에서 유저 찾기
-      const user = await this.prisma.user.findUnique({
-        where: {
-          id,
-        },
-        include: {
-          following: true,
-          followers: true,
-        },
-      });
-      const [totalFollowing, totalFollowers, isMe] = await Promise.all([
-        this.totalFollowing(id), // ! 팔로잉 수
-        this.totalFollowers(id), // ! 팔로워 수
-        this.isMe(user, userId), // ! 내 계정인지 확인
-      ]);
+      const user = await this.prisma.user
+        .findUnique({
+          where: {
+            id,
+          },
+          include: {
+            following: true,
+            followers: true,
+          },
+        })
+        .then(async user => {
+          const [totalFollowing, totalFollowers, isFollowing, isMe] = await Promise.all([
+            this.totalFollowing(id), // ! 팔로잉 수
+            this.totalFollowers(id), // ! 팔로워 수
+            this.isFollowing(user, userId), // ! 팔로잉 여부 확인
+            this.isMe(user, userId), // ! 내 계정인지 확인
+          ]);
+
+          const userResult = {
+            ...user,
+            totalFollowing,
+            totalFollowers,
+            isFollowing,
+            isMe,
+          };
+
+          return userResult;
+        });
       // ! 유저가 없을 경우
       if (!user) {
         return {
@@ -201,13 +231,8 @@ export class UsersService {
       // * 유저가 있을 경우
       return {
         ok: true,
-        user: {
-          ...user,
-          totalFollowing,
-          totalFollowers,
-          isMe,
-        },
-        message: '유저 찾기',
+        user: user,
+        message: USER_SUCCESS.findById.text,
       };
     } catch (error) {
       // ! extraError
@@ -367,7 +392,7 @@ export class UsersService {
     }
   }
 
-  async followUser(userId: number, { username }: FollowUserInput): Promise<FollowUserOutput> {
+  async followerUser(userId: number, { username }: FollowerUserInput): Promise<FollowerUserOutput> {
     try {
       const user = await this.prisma.user.findUnique({ where: { username } });
       if (!user) {
@@ -400,7 +425,7 @@ export class UsersService {
     }
   }
 
-  async unFollowUser(userId: number, { username }: UnFollowUserInput): Promise<UnFollowUserOutput> {
+  async unFollowerUser(userId: number, { username }: UnFollowerUserInput): Promise<UnFollowerUserOutput> {
     try {
       const ok = await this.prisma.user.findUnique({ where: { username } });
       if (!ok) {
