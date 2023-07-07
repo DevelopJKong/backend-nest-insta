@@ -1,5 +1,5 @@
 import { join } from 'path';
-export const PORT = 5000;
+export const PORT = 8000;
 export const PROD = 'production';
 export const DEV = 'development';
 export const CONFIG_OPTIONS = 'CONFIG_OPTIONS';
