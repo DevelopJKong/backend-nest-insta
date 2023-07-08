@@ -2,7 +2,7 @@ import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { Message } from './message.entity';
 import { IsOptional } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
-import { CoreEntity } from 'src/common/entites/core.entity';
+import { CoreEntity } from 'src/common/entities/core.entity';
 
 @InputType('RoomInputType', { isAbstract: true })
 @ObjectType()

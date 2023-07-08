@@ -1,6 +1,6 @@
 import { Photo } from './../../photos/entities/photo.entity';
 import { IsBoolean, IsEmail, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
-import { CoreEntity } from './../../common/entites/core.entity';
+import { CoreEntity } from '../../common/entities/core.entity';
 import { InputType, ObjectType, Field, registerEnumType } from '@nestjs/graphql';
 import { RoleData } from '@prisma/client';
 

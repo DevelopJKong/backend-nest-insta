@@ -1,7 +1,7 @@
 import { Photo } from './../../photos/entities/photo.entity';
 import { User } from './../../users/entities/user.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
-import { CoreEntity } from './../../common/entites/core.entity';
+import { CoreEntity } from '../../common/entities/core.entity';
 import { IsNumber, IsOptional } from 'class-validator';
 
 @InputType('CommentInputType', { isAbstract: true })

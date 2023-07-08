@@ -1,7 +1,7 @@
 import { Hashtag } from './hashtag.entity';
 import { User } from './../../users/entities/user.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
-import { CoreEntity } from './../../common/entites/core.entity';
+import { CoreEntity } from '../../common/entities/core.entity';
 import { IsArray, IsNumber, IsOptional, IsBoolean, IsObject, IsString } from 'class-validator';
 import { Comment } from 'src/comments/entities/comment.entity';
 

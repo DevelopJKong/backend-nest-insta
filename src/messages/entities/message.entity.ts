@@ -1,6 +1,6 @@
 import { User } from './../../users/entities/user.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
-import { CoreEntity } from './../../common/entites/core.entity';
+import { CoreEntity } from '../../common/entities/core.entity';
 import { IsOptional, IsString } from 'class-validator';
 import { Room } from './room.entity';
 
