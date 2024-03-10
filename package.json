@@ -42,7 +42,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "graphql": "^16.7.1",
     "graphql-subscriptions": "^2.0.0",
-    "graphql-upload": "^14.0.0",
+    "graphql-upload": "15.0.2",
     "joi": "^17.9.2",
     "jsonwebtoken": "^9.0.1",
     "lodash": "^4.17.21",
@@ -96,5 +96,13 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "exports": {
+    "./GraphQLUpload.js": "./GraphQLUpload.js",
+    "./graphqlUploadExpress.js": "./graphqlUploadExpress.js",
+    "./graphqlUploadKoa.js": "./graphqlUploadKoa.js",
+    "./package.json": "./package.json",
+    "./processRequest.js": "./processRequest.js",
+    "./Upload.js": "./Upload.js"
   }
 }

@@ -48,3 +48,6 @@ main.session.sql
 
 # file
 files
+
+# node_modules.zip
+node_modules.zip
