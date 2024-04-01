@@ -22,7 +22,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  app.use(graphqlUploadExpress({ maxFileSize: 1000000, maxFiles: 10 }));
+  app.use(graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }));
   app.use('/files', express.static(join(__dirname, '../files')));
   app.enableCors();
 

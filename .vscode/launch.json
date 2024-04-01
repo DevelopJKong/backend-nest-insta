@@ -1,5 +1,4 @@
 {
-  //* 기본 정보 👇
   // IntelliSense를 사용하여 가능한 특성에 대해 알아보세요.
   // 기존 특성에 대한 설명을 보려면 가리킵니다.
   // 자세한 내용을 보려면 https://go.microsoft.com/fwlink/?linkid=830387을(를) 방문하세요.
@@ -18,14 +17,16 @@
   "configurations": [
     {
       "type": "node",
-      "name": "Nestjs Dedegging",
       "request": "launch",
-      "runtimeArgs": ["start:debug"],
-      "runtimeExecutable": "yarn",
+      "name": "Node Debugger",
       "skipFiles": ["<node_internals>/**"],
+      "runtimeArgs": ["start:dev"],
+      "runtimeExecutable": "yarn",
+      "envFile": "${workspaceFolder}/.env.devlopment",
+      "program": "${workspaceFolder}/src/main.ts",
       "sourceMaps": true,
-      "envFile": "${workspaceFolder}/.env.development",
-      "cwd": "${workspaceRoot}",
+      "outFiles": ["${workspaceFolder}/**/*.js"],
+      "cwd": "${workspaceFolder}",
       "console": "integratedTerminal"
     }
   ]

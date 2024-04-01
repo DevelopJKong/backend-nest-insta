@@ -22,17 +22,21 @@ export class UploadsService {
 
       const objectName = `${folderName}/${userId}-${Date.now()}-${filename}`;
       const readStream = createReadStream();
-      const { Location } = await new AWS.S3()
-        .upload({
-          Bucket: BUCKET_NAME,
-          Key: objectName,
-          ACL: 'public-read',
-          Body: readStream,
-        })
-        .promise();
+
+      const params = {
+        Bucket: BUCKET_NAME,
+        Key: objectName,
+        ACL: 'public-read',
+        Body: readStream,
+      };
+
+      const { Location } = await new AWS.S3().upload(params).promise();
 
       return Location;
     } catch (error) {
+      // The AWS Access Key Id you provided does not exist in our records.
+      // PayloadTooLargeError: File truncated as it exceeds the 1000000 byte size limit.
+      console.log(error);
       return null;
     }
   }
