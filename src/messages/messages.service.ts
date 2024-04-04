@@ -90,49 +90,54 @@ export class MessagesService {
     try {
       let room: Room;
 
-      if (userId && userId !== authUser.id) {
-        const user = await this.prisma.user.findUnique({
-          where: {
-            id: userId,
+      if (!userId || userId === authUser.id) {
+        return {
+          ok: false,
+          error: new Error('notFound'),
+          message: '유저가 존재 하지 않습니다.',
+        };
+      }
+
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+
+      if (!user) {
+        return {
+          ok: false,
+          error: new Error('notFound'),
+          message: '유저가 존재 하지 않습니다.',
+        };
+      }
+
+      if (!roomId) {
+        room = await this.prisma.room.create({
+          data: {
+            users: {
+              connect: [
+                {
+                  id: userId,
+                },
+                {
+                  id: authUser.id,
+                },
+              ],
+            },
           },
         });
-        if (!user) {
-          return {
-            ok: false,
-            error: new Error('notFound'),
-            message: '유저가 존재 하지 않습니다.',
-          };
-        }
-
-        if (roomId) {
-          room = await this.prisma.room.findUnique({
-            where: {
-              id: roomId,
-            },
-            select: {
-              id: true,
-              createdAt: true,
-              updatedAt: true,
-            },
-          });
-
-          if (!room) {
-            room = await this.prisma.room.create({
-              data: {
-                users: {
-                  connect: [
-                    {
-                      id: userId,
-                    },
-                    {
-                      id: authUser.id,
-                    },
-                  ],
-                },
-              },
-            });
-          }
-        }
+      } else {
+        room = await this.prisma.room.findUnique({
+          where: {
+            id: roomId,
+          },
+          select: {
+            id: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        });
       }
 
       const message = await this.prisma.message.create({
