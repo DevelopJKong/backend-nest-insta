@@ -15,4 +15,8 @@ export class SendMessageInput extends PickType(Message, ['payload'] as const) {
 }
 
 @ObjectType()
-export class SendMessageOutput extends CoreOutput {}
+export class SendMessageOutput extends CoreOutput {
+  @Field(_type => Message, { nullable: true })
+  @IsOptional()
+  messages?: Message;
+}

@@ -77,12 +77,16 @@ export class MessagesService {
       },
       include: {
         users: true,
+        Message: true,
       },
     });
     return {
       ok: true,
       message: '채팅방 목록 호출 성공',
-      rooms: rooms as Room[],
+      rooms: rooms.map(room => ({
+        ...room,
+        unreadTotal: room.Message.filter(message => message.read === false && message.userId !== userId).length,
+      })) as Room[],
     };
   }
 
@@ -90,7 +94,7 @@ export class MessagesService {
     try {
       let room: Room;
 
-      if (!userId || userId === authUser.id) {
+      if (!userId) {
         return {
           ok: false,
           error: new Error('notFound'),
@@ -154,12 +158,16 @@ export class MessagesService {
             },
           },
         },
+        include: {
+          user: true,
+        },
       });
       // * 메시지 전송시 채팅방 목록에 새로운 메시지가 온 채팅방이 있으면 새로운 메시지를 보여줌
       await this.pubSub.publish(NEW_MESSAGE, { roomUpdates: { ...message } });
       return {
         ok: true,
-        message: '메시지를 전송 성공',
+        message: '메시지 전송 성공',
+        messages: message as Message,
       };
     } catch (error) {
       return { ok: false, error: new Error(error), message: 'extraError' };
@@ -176,10 +184,21 @@ export class MessagesService {
             },
           },
         },
+        include: {
+          Message: {
+            include: {
+              user: true,
+            },
+          },
+        },
       });
       return {
         ok: true,
-        room: room as Room,
+        message: '채팅방 조회 성공',
+        room: {
+          ...room,
+          messages: room.Message,
+        } as Room,
       };
     } catch (error) {
       return { ok: false, error: new Error(error), message: 'extraError' };
