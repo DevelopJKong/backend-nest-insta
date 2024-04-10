@@ -16,18 +16,13 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "node",
+      "command": "yarn start:dev",
+      "name": "Run yarn start:dev",
       "request": "launch",
-      "name": "Node Debugger",
+      "type": "node-terminal",
       "skipFiles": ["<node_internals>/**"],
-      "runtimeArgs": ["start:dev"],
-      "runtimeExecutable": "yarn",
       "envFile": "${workspaceFolder}/.env.devlopment",
-      "program": "${workspaceFolder}/src/main.ts",
-      "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/**/*.js"],
-      "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal"
+      "sourceMaps": true
     }
   ]
 }
