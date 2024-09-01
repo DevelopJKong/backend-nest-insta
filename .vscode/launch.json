@@ -21,7 +21,6 @@
       "request": "launch",
       "type": "node-terminal",
       "skipFiles": ["<node_internals>/**"],
-      "envFile": "${workspaceFolder}/.env.devlopment",
       "sourceMaps": true
     }
   ]

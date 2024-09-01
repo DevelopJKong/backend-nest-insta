@@ -1,4 +1,4 @@
-import * as GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
+import { GraphQLUpload } from 'graphql-upload-ts';
 import { FileUpload } from '../../common/common.interface';
 import { CoreOutput } from '../../common/dto/output.dto';
 import { Photo } from '../entities/photo.entity';

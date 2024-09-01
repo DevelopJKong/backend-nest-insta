@@ -1,7 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
+import { graphqlUploadExpress } from 'graphql-upload-ts';
 import * as fs from 'fs';
 import * as express from 'express';
 import { BACKEND_URL, PORT, fileFolder, DEV } from './common/common.constants';

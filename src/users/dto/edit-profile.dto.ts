@@ -2,7 +2,7 @@ import { FileUpload } from '../../common/common.interface';
 import { InputType, ObjectType, PickType, PartialType, Field } from '@nestjs/graphql';
 import { User } from '../entities/user.entity';
 import { CoreOutput } from '../../common/dto/output.dto';
-import * as GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
+import { GraphQLUpload } from 'graphql-upload-ts';
 import { IsOptional } from 'class-validator';
 
 @InputType()
